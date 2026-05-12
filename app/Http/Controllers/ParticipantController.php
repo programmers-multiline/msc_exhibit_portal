@@ -20,6 +20,7 @@ use App\Imports\ParticipantsImport;
 use Illuminate\Support\Facades\Auth;
 
 use App\Mail\ParticipantBrochureMail;
+use App\Models\Company;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Models\ParticipantFile;
@@ -283,12 +284,15 @@ public function getImages($id)
 
     public function updateStatus(Request $request, $id)
 {
-    try {
+    //Nilabas ko ito for better error return result
+     $request->validate([
+                        'status'        => 'required',
+                        'customer_code' => 'required_if:status,10',
+                        'files'         => 'required_if:status,9',
+                        'files.*'       => 'file|mimes:pdf,jpg,png,jpeg|max:2048',
+                    ]);
 
-        $request->validate([
-            'status' => 'required',
-            'files.*' => 'file|mimes:pdf,jpg,png,jpeg|max:2048'
-        ]);
+    try {
 
         DB::beginTransaction();
 
@@ -313,9 +317,9 @@ public function getImages($id)
         // 🔥 ONLY RUN IF STATUS = 9
         if ((int)$request->status === 9) {
 
-            if (!$request->hasFile('files')) {
+            /* if (!$request->hasFile('files')) {
                 throw new \Exception("Signed proposal file is required.");
-            }
+            } */
 
             foreach ($request->file('files') as $file) {
 
@@ -331,6 +335,19 @@ public function getImages($id)
                 ]);
             }
         }
+
+         if ((int)$request->status === 10) {
+
+           if (!$participant->company) {
+                    throw new \Exception("No company linked to this participant.");
+                }
+
+              $participant->company()->update([
+                        'customer_code' => $request->customer_code,
+                        'updated_at'    => now()
+                    ]);
+            
+            }
 
         DB::commit();
 

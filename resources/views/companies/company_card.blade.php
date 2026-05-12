@@ -109,15 +109,23 @@ Save Assignment
             </select>
         </div>
 
+        <div class="mb-3" id="signedProposalFileWrapper" style="display:none;">
+            <label>Upload Signed Proposal</label>
+            <input type="file" class="form-control" id="signed_proposal_file">
+        </div>
+
+        <div class="mb-3" id="customerCodeWrapper" style="display:none;">
+            <label>Customer Code</label>
+            <input type="text" class="form-control" id="customer_code">
+        </div>
+
+
         <div class="mb-3">
             <label>Description</label>
             <textarea class="form-control" id="description"></textarea>
         </div>
 
-        <div class="mb-3" id="signedProposalFileWrapper" style="display:none;">
-            <label>Upload Signed Proposal</label>
-            <input type="file" class="form-control" id="signed_proposal_file">
-        </div>
+        
 
       </div>
 
@@ -194,11 +202,24 @@ console.log(selected_lead_status);
     if (selected_lead_status == 9) {
         $('#signedProposalFileWrapper').show();
         $('#signed_proposal_file').prop('required', true);
-    } else {
+    } 
+    else {
         $('#signedProposalFileWrapper').hide();
         $('#signed_proposal_file').prop('required', false);
         $('#signed_proposal_file').val('');
     }
+
+    if (selected_lead_status == 10) {
+        $('#customerCodeWrapper').show();
+        $('#customer_code').prop('required', true);
+    } 
+    else {
+        $('#customerCodeWrapper').hide();
+        $('#customer_code').prop('required', false);
+        $('#customer_code').val('');
+    }
+
+    
 });
 
 
@@ -318,6 +339,7 @@ let companiesData = []; // store AJAX response globally
 let viewAllMode = false;
 
 // Load Companies
+/*
 function loadCompanies(url = "/company_card/list?page=1") {
     $.ajax({
         url: url,
@@ -424,6 +446,269 @@ if(company.latest_updates && company.latest_updates.length > 0){
             $('#summary').html(`Showing ${response.from} - ${response.to} of ${response.total} companies`);
         }
     });
+}*/
+function loadCompanies(url = "/company_card/list?page=1") {
+    $.ajax({
+        url: url,
+        type: "GET",
+        data: {
+            search: $('#companySearch').val(),
+            view_all: viewAllMode ? 1 : 0
+        },
+        beforeSend: function(){
+            $('#companyList').html('<div class="text-center w-100">Loading...</div>');
+        },
+        success: function(response){
+            companiesData = response.data;
+            let html = '';
+
+            response.data.forEach(company => {
+                let participants = company.participants ?? [];
+                let contactHtml = '';
+
+                participants.forEach((c, index) => {
+                    let imagesHtml = '';
+
+                    if(c.images && c.images.length > 0){
+                        let img = c.images[0];
+                        imagesHtml = `
+                            <img src="/storage/participants/${img.image_name}" 
+                                 alt="${c.participant_name}"
+                                 class="img-thumbnail participant-img viewImages mt-2"
+                                 style="width:70px;height:70px;object-fit:cover;border-radius:8px;"
+                                 data-participant-id="${img.participant_id}">
+                        `;
+                    } else {
+                        imagesHtml = `<div class="text-muted small mt-2">No Images</div>`;
+                    }
+
+                    contactHtml += `
+                        <div class="border rounded p-3 mb-3 bg-light">
+                            <small class="text-muted fw-bold">Contact Person ${index + 1}</small>
+
+                            <div class="fw-bold fs-6 mt-1">
+                                ${c.participant_name ?? ''}
+                            </div>
+
+                            <div class="small mt-2">
+                                📞 ${c.participant_contact ?? '-'}
+                            </div>
+
+                            <div class="small">
+                                📧 ${c.participant_email ?? '-'}
+                            </div>
+
+                            <div class="small">
+                                📍 ${c.participant_address ?? '-'}
+                            </div>
+
+                            ${imagesHtml}
+                        </div>
+                    `;
+                });
+
+                let latestUpdateHtml = '';
+
+                if(company.latest_updates && company.latest_updates.length > 0){
+                    console.log(company.latest_updates[0]);
+                    company.latest_updates.forEach(update => {
+                        latestUpdateHtml += `
+                            <div class="border-start border-4 border-warning ps-3 py-2 bg-light rounded-end mb-2">
+                                <span class="badge bg-success mb-2">
+                                    ${update.lead_status}
+                                </span>
+
+                                <div class="small text-muted">
+                                    ${update.update_date}
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    latestUpdateHtml = `
+                        <div class="text-muted small">
+                            No updates yet.
+                        </div>
+                    `;
+                }
+
+                let agentHtml = '';
+
+                if(company.assigned_agent){
+                    agentHtml = `
+                                <div class="d-flex align-items-center gap-3 border rounded-3 p-3 bg-success bg-opacity-10">
+                                    <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center"
+                                        style="width:45px;height:45px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+
+                                    <div>
+                                        <div class="fw-bold">
+                                            ${company.assigned_agent.psc_name ?? 'N/A'}
+                                        </div>
+
+                                        <small class="text-muted">
+                                            ID: ${company.assigned_agent.psc_emp_id ?? 'N/A'}
+                                        </small>
+                                    </div>
+                                </div>
+                            `;
+                } else {
+                    agentHtml = `
+                        <div class="text-muted small">
+                            No Agent Assigned
+                        </div>
+                    `;
+                }
+
+                //For Progress Bar
+                let progressPercent = 0;
+let progressColor = 'bg-secondary';
+let progressLabel = 'No Status';
+
+if (company.latest_updates && company.latest_updates.length > 0) {
+    const latest = company.latest_updates[0];
+    const statusId = parseInt(latest.status);
+
+    const progressMap = {
+        1: { percent: 10, color: 'bg-secondary' , label: 'New Lead' },
+        2: { percent: 15, color: 'bg-secondary' , label: 'Uncontacted' },
+        3: { percent: 25, color: 'bg-info'      , label: 'Contacted' },
+        4: { percent: 40, color: 'bg-primary'   , label: 'Interested' },
+        5: { percent: 50, color: 'bg-warning'   , label: 'Follow-up Needed' },
+        6: { percent: 60, color: 'bg-warning'   , label: 'For RFQ' },
+        7: { percent: 75, color: 'bg-primary'   , label: 'Received Proposal' },
+        8: { percent: 85, color: 'bg-primary'   , label: 'Revised Proposal' },
+        9: { percent: 95, color: 'bg-success'   , label: 'Signed Proposal' },
+        10:{ percent:100, color: 'bg-success'   , label: 'Converted' },
+        11:{ percent:100, color: 'bg-danger'    , label: 'Closed / Lost' },
+        12:{ percent:100, color: 'bg-success'   , label: 'Existing Client' }
+    };
+
+    if (progressMap[statusId]) {
+        progressPercent = progressMap[statusId].percent;
+        progressColor   = progressMap[statusId].color;
+        progressLabel   = progressMap[statusId].label;
+    }
+}
+
+                //Ending For Progress Bar
+
+                html += `
+                    <div class="col-md-4 mb-4">
+                        <div class="card border-0 shadow-lg rounded-4 overflow-hidden crm-card h-100">
+
+                            <div class="card-body">
+
+                                <!-- COMPANY HEADER -->
+                                <div class="p-3 text-white rounded-4 mb-3" style="background: linear-gradient(135deg,#0d6efd,#6610f2);">
+                                    <h5 class="fw-bold text-white mb-1">
+                                        ${company.company_name ?? ''}
+                                    </h5>
+
+                                    <div class="small text-light">
+                                        #${company.id}
+                                        <i class="far fa-building ms-1"></i>
+                                    </div>
+
+                                    
+                                    <div class="small text-white-50 fst-italic mt-1">
+                                        ${company.address ?? 'No Address'}
+                                        <i class="fas fa-edit text-secondary ms-2"
+                                           style="cursor:pointer;"
+                                           title="Update Address"
+                                           id="UpdateAddressModal"
+                                           data-c_id="${company.id}"
+                                           data-company_name="${company.company_name}">
+                                        </i>
+                                    </div>
+                                </div>
+                                
+                                <!-- Progress Bar -->
+                             <div class="mb-4">
+                                <small class="text-muted fw-bold">Lead Pipeline</small>
+
+                                <div class="progress mt-2" style="height:10px;">
+                                    <div class="progress-bar ${progressColor}"
+                                        role="progressbar"
+                                        style="width:${progressPercent}%">
+                                    </div>
+                                </div>
+
+                                <small class="fw-bold text-muted">
+                                    ${progressLabel} (${progressPercent}%)
+                                </small>
+                            </div>
+                                
+
+
+
+                                <!-- ASSIGN CHECKBOX -->
+                                <div class="mb-4">
+                                    <input type="checkbox"
+                                           class="participant_checkbox"
+                                           value="${company.id}">
+                                    <small class="text-danger fst-italic">
+                                        Check to Assign Agent
+                                    </small>
+                                </div>
+
+                                <!-- CONTACT PERSONS -->
+                                <div class="mb-4">
+                                    <div class="bg-primary text-white rounded px-3 py-2 mb-3">
+                                        Company Contacts
+                                    </div>
+
+                                    ${contactHtml}
+                                </div>
+
+                                <!-- AGENT DETAILS -->
+                                <div class="mb-4">
+                                    <div class="bg-success text-white rounded px-3 py-2 mb-3">
+                                        Agent Details
+                                    </div>
+
+                                    ${agentHtml}
+                                </div>
+
+                                <!-- LATEST UPDATE -->
+                                <div class="mb-4">
+                                    <div class="bg-warning text-dark rounded px-3 py-2 mb-3">
+                                        Latest Agent Update
+                                    </div>
+
+                                    ${latestUpdateHtml}
+                                </div>
+
+                                <!-- ACTION BUTTONS -->
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-sm btn-secondary w-50 btnUpdateStatus"
+                                            data-id="${company.id}"
+                                            data-cname="${company.company_name ?? ''}">
+                                        Update Status
+                                    </button>
+
+                                    <button class="btn btn-sm btn-warning w-50 btnAddContact"
+                                            data-id="${company.id}">
+                                        Add Contact
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            $('#companyList').html(html);
+            buildPagination(response);
+
+            $('#summary').html(`
+                Showing ${response.from} - ${response.to}
+                of ${response.total} companies
+            `);
+        }
+    });
 }
 
 // Pagination builder
@@ -482,10 +767,11 @@ $(document).on('click', '.pagination-link', function(e){
 //Use to update status of attendees
 $('#saveStatus').click(function(){
 
-    var id          = $('#participant_id').val();
-    var lead_status = $('#lead_status').val();
-    var description = $('#description').val();
-    var files       = $('#signed_proposal_file')[0].files;
+    var id            = $('#participant_id').val();
+    var lead_status   = $('#lead_status').val();
+    var description   = $('#description').val();
+    var files         = $('#signed_proposal_file')[0].files;
+    var customer_code = $('#customer_code').val();
 
     // Required only if status = 9
     if (lead_status == 9 && files.length === 0) {
@@ -497,10 +783,20 @@ $('#saveStatus').click(function(){
         return;
     }
 
+     if (lead_status == 10 && !customer_code) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Customer Code Required',
+                text: 'Please input the customer code'
+            });
+            return;
+        }
+
     let formData = new FormData();
     formData.append('_token', '{{ csrf_token() }}');
     formData.append('status', lead_status);
     formData.append('description', description);
+    formData.append('customer_code', customer_code);
 
     // Attach files only if exists
     for (let i = 0; i < files.length; i++) {
@@ -514,6 +810,15 @@ $('#saveStatus').click(function(){
         processData: false,
         contentType: false,
         success: function(response){
+
+            $('#participant_id').val('');
+            $('#lead_status').val('').trigger('change');
+            $('#description').val('');
+            $('#customer_code').val('');
+            $('#signed_proposal_file').val('');
+            $('#signedProposalFileWrapper').hide();
+            $('#customerCodeWrapper').hide();
+
 
             $('#statusModal').modal('hide');
 
@@ -605,5 +910,31 @@ $('#saveAddress').click(function(){
 });
 
 </script>
+
+<style>
+    .card:hover{
+    transform: translateY(-3px);
+    transition: .2s ease;
+}
+
+.participant-img:hover{
+    transform: scale(1.05);
+    transition: .2s ease;
+}
+
+.crm-card{
+    transition: all .25s ease;
+}
+
+.crm-card:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 1rem 2rem rgba(0,0,0,.15)!important;
+}
+
+.participant-img:hover{
+    transform: scale(1.08);
+    transition: .2s ease;
+}
+    </style>
 
 @endsection

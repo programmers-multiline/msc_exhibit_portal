@@ -27,6 +27,13 @@
 							<li class="{{ request()->is('participants') ? 'active' : '' }}"><a href="/participants">Partcipants</a></li>
 						</ul>
 					</li>
+
+					<li class="{{ request()->is('client') || request()->is('client/*') ? 'active' : '' }}">
+						<a href="{{ url('client') }}" class="dropdown-toggle no-arrow">
+							<span class="micon dw dw-invoice"></span>
+							<span class="mtext">Client List</span>
+						</a>
+					</li>
 				
 					<li>
 						<div class="dropdown-divider"></div>

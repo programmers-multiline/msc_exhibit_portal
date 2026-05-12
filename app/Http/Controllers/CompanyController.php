@@ -105,10 +105,11 @@ public function saveCompany(Request $request)
 public function index(Request $request)
 {
 
-$user        = Auth::user();
-
- 
-
+$user  = Auth::user();
+$users = ExternalUser::getUsersWithCompanyAndDepartment();
+ //console.log($users);
+//dd($users);
+//$empIds = $users->pluck('emp_id');
     
 //dd('Test');
 
@@ -167,10 +168,10 @@ foreach ($grouped as $companyId => $contacts) {
     ->make(true);
     }
 
-    $users = \App\Models\User::whereIn('department_id',[16, 64, 27])
+  /*   $users = \App\Models\User::whereIn('department_id',[16, 64, 27])
     ->where('company_id', 3)
     ->where('status', 1)
-    ->orderBy('first_name')->get();
+    ->orderBy('first_name')->get(); */
 
     return view('companies.index', compact('users'));
    // return view('products.create', compact('lead_agent_status'));

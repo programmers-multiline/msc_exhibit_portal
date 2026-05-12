@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\ParticipantBrochureMail;
 use App\Http\Controllers\BrochureController;
 use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\CustomerList;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,6 +36,12 @@ Route::post('/participants/import', [ParticipantController::class, 'importExcel'
 Route::get('/contacts', [ParticipantController::class, 'contacts']);
 Route::get('/contacts/search', [ParticipantController::class, 'search']);
 Route::get('/companies', [CompanyController::class, 'index']);
+
+Route::get('/client', [CustomerList::class, 'index']);
+Route::get('/client/list', [CustomerList::class, 'ClientList']);
+
+Route::get('/client_card', [CustomerList::class, 'client_card']);
+Route::get('/client/Cardlist', [CustomerList::class, 'ClientCardList']);
 
 Route::post('/companies/update-address', [CompanyController::class, 'updateAddress']);
 
