@@ -1,5 +1,12 @@
 <?php
 
+use App\Http\Controllers\Api\SalesManagerController;
+use App\Http\Controllers\Api\SalesUserController;
+use App\Http\Controllers\Api\LeadStatusUpdateController;
+use App\Http\Controllers\Api\APIParticipantController;
+use App\Http\Controllers\Api\CompanyListController;
+use App\Http\Controllers\Api\UserListController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +20,21 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+Route::get('/SalesManager', [SalesManagerController::class, 'getSalesManager']);
+Route::get('/SalesGrouping', [SalesUserController::class, 'getSalesUser']);
+Route::get('/LeadStatusUpdate', [LeadStatusUpdateController::class, 'index']);
+Route::get('/CompanyList', [CompanyListController::class, 'getCompanyList']);
+Route::get('/users', [UserListController::class, 'getUserList']);
+
+
+
+
+
+
+Route::post('/attendee', [APIParticipantController::class, 'attendee']);
+Route::get('/participant-images/{id}', [APIParticipantController::class, 'getImages']);
+
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

@@ -26,6 +26,7 @@ use App\Http\Controllers\CustomerList;
 
 Route::get('/participants', [ParticipantController::class, 'index'])->name('participants.index');
 Route::get('/participants/create', [ParticipantController::class, 'create'])->name('participants.create');
+Route::get('/participants/add_participant', [ParticipantController::class, 'add_participant'])->name('participants.add_participant');
 Route::post('/participants/attendee', [ParticipantController::class, 'attendee']);
 Route::get('/participants/images/{id}', [ParticipantController::class,'getImages']);
 Route::post('/participants/update-status/{id}',[ParticipantController::class, 'updateStatus']);

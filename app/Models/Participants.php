@@ -15,6 +15,7 @@ class Participants extends Model
     'entry_by',
     'day_num',
     'level_type',
+    'participant_type',
     'participant_name',
     'participant_email',
     'participant_company',

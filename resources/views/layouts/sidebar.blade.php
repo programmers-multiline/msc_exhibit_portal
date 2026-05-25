@@ -13,7 +13,8 @@
 				<ul id="accordion-menu">
 				
 					<li class="dropdown {{ request()->is('participant/create') ? 'active' : '' }}">
-						<a href="/participant/create" class="dropdown-toggle no-arrow">
+					<!-- 	<a href="/participant/create" class="dropdown-toggle no-arrow"> -->
+						<a href="/participants/add_participant" class="dropdown-toggle no-arrow">
 							<span class="micon dw dw-invoice"></span><span class="mtext">Add Contact</span>
 						</a>
 					</li>

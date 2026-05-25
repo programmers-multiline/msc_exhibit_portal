@@ -146,6 +146,31 @@ public function create(Request $request)
     return view('participants.create', compact('companies','users','selected_company_id','addresses','selected_company_name'));
 }
 
+public function add_participant(Request $request)
+{
+ $user = Auth::user();
+
+    if(!$user){
+        return redirect('/login');
+    }
+    $companies = \App\Models\Company::orderBy('company_name')->get();
+
+      // $companies = Company::all();
+    $users = User::all();
+
+
+    $addresses = DB::table('ph_address')
+    ->whereIn('geographic_level', ['City', 'Prov'])
+    ->orderBy('address_name', 'ASC')
+    ->get();
+
+
+    $selected_company_id   = $request->company_id;
+    $selected_company_name = $request->company_name;
+
+    return view('participants.add_participant', compact('companies','users','selected_company_id','addresses','selected_company_name'));
+}
+
 
 public function attendee(Request $request)
 {
@@ -800,8 +825,9 @@ DB::table('attendees_list')->insert([
 public function storeAjax(Request $request)
 {
     $request->validate([
-        'company_id'       => 'required',
-        'participant_name' => 'required'
+            'participant_type' => 'required',
+            'participant_name' => 'required',
+            'company_id'       => 'nullable|required_if:participant_type,Company'
     ]);
 
     $user = Auth::user();
@@ -812,29 +838,31 @@ public function storeAjax(Request $request)
 
         // 1. Insert participant
         $participant = \App\Models\Participants::create([
-            'company_id'           => $request->company_id,
-            'entry_by'             => $user->emp_id,
-            'day_num'              => now()->setTimezone('Asia/Manila')->format('Y-m-d'),
-            'participant_name'     => $request->participant_name,
-            'participant_email'    => $request->email,
-            'participant_contact'  => $request->contact,
-            'participant_position' => $request->participant_position,
-            'participant_source'   => $request->participant_source,
-            'participant_address'  => $request->address,
-            'participant_remarks'  => $request->participant_remarks,
-            'exhibit_name'         => $request->exhibit_name,
-            'level_type'           => $request->level_type,
-            'entry_from'           => 'Online'
+           'company_id'           => $request->company_id,
+           'entry_by'             => $user->emp_id,
+           'day_num'              => now()->setTimezone('Asia/Manila')->format('Y-m-d'),
+           'participant_type'     => $request->participant_type,
+           'participant_name'     => $request->participant_name,
+           'participant_email'    => $request->email,
+           'participant_contact'  => $request->contact,
+           'participant_position' => $request->participant_position,
+           'participant_source'   => $request->participant_source,
+           'participant_address'  => $request->address,
+           'participant_remarks'  => $request->participant_remarks,
+           'exhibit_name'         => $request->exhibit_name,
+           'level_type'           => $request->level_type,
+           'entry_from'           => 'Online'
         ]);
 
         // 2. Insert attendees_list
         DB::table('attendees_list')->insert([
-            'company_id'    => $request->company_id,
-            'exhibit_name'  => $request->exhibit_name,
-            'year_attended' => now()->format('Y-m-d'),
-            'encoded_by'    => $user->emp_id,
-            'created_at'    => now(),
-            'updated_at'    => now(),
+            'company_id'       => $request->company_id,
+            'exhibit_name'     => $request->exhibit_name,
+           
+            'year_attended'    => now()->format('Y-m-d'),
+            'encoded_by'       => $user->emp_id,
+            'created_at'       => now(),
+            'updated_at'       => now(),
         ]);
 
         DB::table('company_list')

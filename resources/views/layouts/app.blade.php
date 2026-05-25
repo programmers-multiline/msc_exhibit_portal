@@ -21,6 +21,9 @@
 <link rel="stylesheet" href="{{ asset('vendors/styles/style.css') }}">
 <link rel="stylesheet" href="{{ asset('vendors/styles/icon-font.min.css') }}">
 
+<link rel="stylesheet" href="{{ asset('vendors/bootstrap-icons/bootstrap-icons.min.css') }}">
+<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"> -->
+
 <!-- <link rel="stylesheet" href="{{ asset('vendors/styles/pagination_style.css') }}"> -->
 
 <link rel="stylesheet" href="{{ asset('src/plugins/datatables/css/dataTables.bootstrap4.min.css') }}">
@@ -34,10 +37,13 @@
 <!-- DataTable JS -->
 <!--  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script> -->
  <script src="{{ asset('src/plugins/datatables/js/jquery-3.7.0.min.js') }}"></script>
-<!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> -->
- <link rel="stylesheet" href="{{ asset('css/fontawesome.css') }}">
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <!-- <link rel="stylesheet" href="{{ asset('css/all.min.css') }}"> -->
+<!--  <link rel="stylesheet" href="{{ asset('css/fontawesome.css') }}"> -->
 <!--  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0/dist/css/select2.min.css" rel="stylesheet"/> -->
  <link rel="stylesheet" href="{{ asset('src/plugins/select2/dist/css/select2.min.css') }}">
+
+
 
 
 
