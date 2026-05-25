@@ -18,39 +18,34 @@
         </small>
     </div>
 
-    <div class="row g-3">
+    <div class="d-flex flex-wrap gap-2">
 
-    <div class="col-6 col-md-2">
-        <button type="button" class="btn participant-btn company-btn w-100" id="companybtn">
-            <i class="bi bi-building"></i> Company
+        <button type="button" class="btn participant-btn company-btn" id="companybtn" value="You are under Company">
+            <i class="bi bi-building"></i>
+            <span>Company</span>
         </button>
-    </div>
 
-    <div class="col-6 col-md-2">
-        <button type="button" class="btn participant-btn student-btn w-100" id="studentbtn">
-            <i class="bi bi-mortarboard"></i> Student
+        <button type="button" class="btn participant-btn student-btn" id="studentbtn">
+            <i class="bi bi-mortarboard"></i>
+            <span>Student</span>
         </button>
-    </div>
 
-    <div class="col-6 col-md-2">
-        <button type="button" class="btn participant-btn freelancer-btn w-100" id="freelancerbtn">
-            <i class="bi bi-person-workspace"></i> Freelancer
+        <button type="button" class="btn participant-btn freelancer-btn" id="freelancerbtn">
+            <i class="bi bi-person-workspace"></i>
+            <span>Freelancer</span>
         </button>
-    </div>
 
-    <div class="col-6 col-md-2">
-        <button type="button" class="btn participant-btn government-btn w-100" id="governmentbtn">
-            <i class="bi bi-bank"></i> Government
+        <button type="button" class="btn participant-btn government-btn" id="governmentbtn">
+            <i class="bi bi-bank"></i>
+            <span>Government</span>
         </button>
-    </div>
 
-    <div class="col-6 col-md-2">
-        <button type="button" class="btn participant-btn ngo-btn w-100" id="ngobtn">
-            <i class="bi bi-globe"></i> NGO
+         <button type="button" class="btn participant-btn ngo-btn" id="ngobtn">
+            <i class="bi bi-globe"></i>
+            <span>NGO</span>
         </button>
-    </div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -68,10 +63,7 @@
 <input type="hidden" name="participant_type" id="participantType">
 <!-- depende sa selection ng Type -->
 
-<div class="section-header">
-    <i class="bi bi-building me-2"></i>
-    Company Details
-</div>
+<div  style="background-color: #F5CE62; width:100%; padding:4px; font-weight:500; color:black;">Company Details</div>
 
 
 
@@ -164,10 +156,7 @@
 
 <div id="ContactPersonDetailsDiv" style=" padding:8px; border-style: solid; border-width: 1px; border-color: orange; display:none;">
 
-<div class="contact-header">
-    <i class="bi bi-person-lines-fill me-2"></i>
-    <span id="ContactPerson"></span> Details
-</div>
+<div  style="background-color: #F5CE62; width:100%; padding:6px; font-weight:500; color:black;"><span id="ContactPerson"></span>&nbsp; Details</div>
 <hr>
 
 
@@ -791,46 +780,9 @@ $(document).ready(function(){
 
 });///ending of Document Ready
 
-$('.participant-btn').click(function(){
-    $('.participant-btn').removeClass('active');
-    $(this).addClass('active');
-});
-
 </script>
 
 <style id="tcc29v">
-.section-header{
-    background: linear-gradient(135deg, #F5CE62, #f7d97a);
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-weight: 600;
-    color: #2b2b2b;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    margin-bottom: 12px;
-}
-
-.contact-header{
-    background: linear-gradient(135deg, #F5CE62, #f7d97a);
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-weight: 600;
-    color: #2b2b2b;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-}
-
-
-.participant-btn.active{
-    transform: scale(1.05);
-    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-    border: 2px solid #00000020;
-}
-
 .participant-type-card{
     padding:15px;
     border:1px solid #e9ecef;
@@ -839,14 +791,15 @@ $('.participant-btn').click(function(){
 }
 
 .participant-btn{
-   border-radius:10px;
-    font-size:13px;
+    border-radius:10px;
+    padding:10px 18px;
+    font-size:14px;
     font-weight:600;
     display:flex;
     align-items:center;
-    justify-content:center;
-    gap:6px;
-    transition:.2s;
+    gap:8px;
+    transition:all .2s ease;
+    border:none;
 }
 
 .participant-btn i{
