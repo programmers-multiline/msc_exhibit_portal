@@ -117,47 +117,6 @@
 <input type="text" name="address" id="address" class="form-control mb-3" placeholder="Complete Company Address" value="{{ $selectedAddress }}" style="font-size:12px; width:100%">
 </div>
 
-<!-- <div class="mt-2">
-<span style="font-size:12px; font-weight:500;">Company City/Province</span>
-<select id="city_province" name="city_province" class="form-control select2 mb-3" style="font-size:12px; width:100%">
-    <option value="">Select City/Province</option>
-
-    @foreach($addresses as $address)
-        <option value="{{ $address->cor_code }}"
-             {{ isset($city_province_code) && $city_province_code == $address->cor_code ? 'selected' : '' }}>
-            {{ $address->address_name }}
-        </option>
-    @endforeach
-</select>
-</div> -->
-
-<div class="mt-2">
-<!-- span style="font-size:12px; font-weight:500;">Company Category</span>
-@php
-    $selectedCompany = collect($companies)->firstWhere('id', request('company_id'));
-@endphp -->
-
-<!-- <select name="level_type" id="level_type" class="form-control select2 mb-3" style="font-size:12px; width:100%">
-    <option value="">Select Level</option>
-
-    <option value="High"
-        {{ ($selectedCompany['level_type'] ?? '') == 'High' ? 'selected' : '' }}>
-        High
-    </option>
-
-    <option value="Mid"
-        {{ ($selectedCompany['level_type'] ?? '') == 'Mid' ? 'selected' : '' }}>
-        Mid
-    </option>
-
-    <option value="Low"
-        {{ ($selectedCompany['level_type'] ?? '') == 'Low' ? 'selected' : '' }}>
-        Low
-    </option>
-</select> -->
-
-</div>
-
 </div>
 <!-- Ending of Company Details -->
 <br>
@@ -189,41 +148,19 @@
 <div class="mt-2">
 <span style="font-size:12px; font-weight:500;">Contact Email Address</span>
 <input type="email" id="email" name="email" class="form-control mb-3" placeholder="Email" >
+<small id="email-error" style="color:red; display:none;">
+    Invalid Email format
+</small>
 </div>
 
 <div class="mt-2">
 <span style="font-size:12px; font-weight:500;">Contact Number</span>
-<input type="text" id="contact" name="contact" class="form-control mb-3" maxlength="11" placeholder="Contact">
+<input type="text" id="participant_contact" name="contact" class="form-control mb-3" maxlength="11" placeholder="Contact">
 </div>
 
 
 
-<!-- <div class="mt-2">
-    <span style="font-size:12px; font-weight:500;">Contact Job Designation</span>
-<input type="text" name="participant_position" class="form-control mb-3" placeholder="Participant Postion">
-</div> -->
 
-<!-- <div class="mt-2">
-    <span style="font-size:12px; font-weight:500;">Exhibit Name</span>
- <select name="exhibit_name" id="exhibit_name" class="form-control mb-3" readonly>
-                            <option value="">Select</option>
-                            <option value="WorldBex" selected>WorldBex</option>
-                            <option value="PHA">PHA</option> 
-                            <option value="PhilConstruct">PhilConstruct</option> 
- </select>
-</div> -->
-<!-- 
-<div class="mt-2">
-    <span style="font-size:12px; font-weight:500;">Contact Inquiry</span>
-<input type="text" name="participant_remarks" class="form-control mb-3" placeholder="Participant Inquiry">
-</div> -->
-
-
-
-<!-- <div class="mt-2">
-    <span style="font-size:12px; font-weight:500;">Upload Photo of Contact Person</span>
- <input type="file" name="participant_photo[]" id="participantPhoto" class="form-control mb-3" multiple>
-</div> -->
 
 <div class="mt-2">
     <label for="participantPhoto" class="form-label d-block" style="font-size:12px; font-weight:500;">
@@ -258,61 +195,94 @@ Save
 </div>
 <script>
 
+//validate if Email format
+$('#email').on('keyup blur', function () {
+
+    let email   = $(this).val();
+    let pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (email === '') {
+        $('#email-error').hide();
+    }
+    else if (!pattern.test(email)) {
+        $('#email-error').show();
+         $('#email').css('background','linear-gradient(135deg, #fcb9e5, #fff3cd)');
+    }
+    else {
+        $('#email-error').hide();
+        $('#email').css('background','linear-gradient(135deg, #fff, #fff)');
+    }
+
+});
+
+    //Allow integer only
+$('#contact').on('input', function () {
+    this.value = this.value.replace(/[^0-9]/g, '');
+});
+
 
 $('#companybtn').click(function(e){
+    
     $('#CompanyNotExist').show(); 
-    $('#CompanyDetailsDiv').show();  
-    $('#WelcomeDiv').show(); 
+    $('#CompanyDetailsDiv').show();
+    //$('#WelcomeDiv').show(); 
     $('#WelcomeText').text('You are under Company'); 
     $('#ContactPerson').text('Contact Person'); 
     
-    $('#ContactPersonDetailsDiv').show(); 
+    $('#ContactPersonDetailsDiv').show();
+    $('.contact-header').css('background','linear-gradient(135deg, #ecb605, #fff3cd)');
 
-     $('#contact_person_div').show(); 
+    $('#contact_person_div').show(); 
     $('#participantType').val('Company');
 });
 
 $('#studentbtn').click(function(e){
     $('#CompanyNotExist').hide(); 
     $('#CompanyDetailsDiv').hide();  
-     $('#WelcomeDiv').show(); 
+    // $('#WelcomeDiv').show(); 
     $('#WelcomeText').text('Welcome Student');   
-     $('#ContactPerson').text('Student'); 
-      $('#ContactPersonDetailsDiv').show(); 
-
-       $('#contact_person_div').hide(); 
-       $('#participantType').val('Student');
+    $('#ContactPerson').text('Student'); 
+    $('#ContactPersonDetailsDiv').show().css('background','linear-gradient(135deg, #f8f7f6ef, #f1f1f1e3)');
+    $('.contact-header').css('background','linear-gradient(135deg, #b4b3b1, #f1f1f1e3)');
+    $('#contact_person_div').hide(); 
+    $('#participantType').val('Student');
       
 });
 
 $('#freelancerbtn').click(function(e){
     $('#CompanyNotExist').hide(); 
     $('#CompanyDetailsDiv').hide(); 
-     $('#WelcomeDiv').show(); 
+    // $('#WelcomeDiv').show(); 
     $('#WelcomeText').text('Welcome Freelancer'); 
     $('#ContactPerson').text('Freelancer'); 
-     $('#ContactPersonDetailsDiv').show();   
+     $('#ContactPersonDetailsDiv').show();
+     $('.contact-header').css('background','linear-gradient(135deg, #d1e7dd, #fff3cd)');   
      $('#participantType').val('Freelancer');
 });
 
 $('#governmentbtn').click(function(e){
     $('#CompanyNotExist').hide(); 
     $('#CompanyDetailsDiv').hide(); 
-     $('#WelcomeDiv').show(); 
+    $('#contact_person_div').hide(); 
+    // $('#WelcomeDiv').show(); 
     $('#WelcomeText').text('Government Employee'); 
     $('#ContactPerson').text('Government'); 
-     $('#ContactPersonDetailsDiv').show();   
-     $('#participantType').val('Government');
+    
+    $('#ContactPersonDetailsDiv').show();  
+    $('.contact-header').css('background','linear-gradient(135deg, #FAA08E, #fff3cd)');   
+    $('#participantType').val('Government');
+     
 });
 
 $('#ngobtn').click(function(e){
     $('#CompanyNotExist').hide(); 
     $('#CompanyDetailsDiv').hide(); 
-     $('#WelcomeDiv').show(); 
+    // $('#WelcomeDiv').show(); 
     $('#WelcomeText').text('Non-government Organization'); 
     $('#ContactPerson').text('NGO'); 
-     $('#ContactPersonDetailsDiv').show();   
-     $('#participantType').val('NGO');
+    $('#ContactPersonDetailsDiv').show();   
+    $('.contact-header').css('background','linear-gradient(135deg, #91A4F8, #fff3cd)'); 
+    $('#participantType').val('NGO');
 });
 
 
@@ -654,7 +624,7 @@ $(document).ready(function(){
     });
 
 }); */
-
+//
 $(document).ready(function(){
 
     $('.select2').select2();
@@ -703,6 +673,8 @@ $(document).ready(function(){
         // ✅ SHOW kapag may laman
         $('#contact_person').closest('.form-control').show();
         $('#contact_person_div').show();
+       //$('#contact').val(participant_contact.participant_name);
+        
 
     } else {
     console.log('No contact');
@@ -740,6 +712,7 @@ $(document).ready(function(){
        $('#contact_person').on('change', function() {
 
         let id = $(this).val(); //this is a table id
+       // alert(id)
 
         if(id){
 
@@ -813,7 +786,7 @@ $('.participant-btn').click(function(){
 }
 
 .contact-header{
-    background: linear-gradient(135deg, #F5CE62, #f7d97a);
+    /* background: linear-gradient(135deg, #F5CE62, #f7d97a); */
     padding: 10px 14px;
     border-radius: 10px;
     font-weight: 600;

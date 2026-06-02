@@ -129,3 +129,21 @@ Route::get('/test-mail', function() {
         return 'Email failed: ' . $e->getMessage();
     }
 });
+
+
+use OpenAI\Laravel\Facades\OpenAI;
+
+Route::get('/ai-test', function () {
+
+    $response = OpenAI::chat()->create([
+        'model' => 'gpt-4.1-mini',
+        'messages' => [
+            [
+                'role' => 'user',
+                'content' => 'Hello AI'
+            ]
+        ],
+    ]);
+
+    return $response['choices'][0]['message']['content'];
+});
