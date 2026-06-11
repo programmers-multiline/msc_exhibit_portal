@@ -86,6 +86,26 @@ public function updateAddress(Request $request)
     return response()->json(['success' => true]);
 }
 
+
+public function UpdateContactDetails(Request $request)
+{
+    $request->validate([
+        'participant_name'    => 'required|string',
+        'participant_contact' => 'required|string'
+    ]);
+
+    Participants::where('id', $request->p_id)
+        ->update([
+            'participant_name'    => $request->participant_name,
+            'participant_email'   => $request->participant_email,
+            'participant_contact' => $request->participant_contact
+        ]);
+
+    return response()->json([
+        'success' => true
+    ]);
+}
+
 public function saveCompany(Request $request)
 {
     $request->validate([

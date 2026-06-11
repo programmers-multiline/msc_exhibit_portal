@@ -30,7 +30,6 @@ public function assignedAgent() {
     protected $fillable = [
         'id',
         'company_name',
-        // idagdag mo pa ibang fields kung meron
         'company_id',
         'Address',
         'created_at',

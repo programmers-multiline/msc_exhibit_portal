@@ -1,7 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-
+<!-- <pre>
+@foreach($products as $product)
+    <p>
+        ID: {{ $product->id }} |
+        Name: {{ $product->name }}
+    </p>
+@endforeach
+</pre> -->
 <div class="container mt-4">
 
 <h3 class="mb-4">Add Participant</h3>
@@ -76,7 +83,7 @@
 
 
 <div class="mt-2">
-<span style="font-size:12px; font-weight:500;">Company Name</span>
+<span style="font-size:12px; font-weight:500;">Company Name</span><span class="text-danger">*</span>
 
         
         <select name="company_id" id="company_id" class="form-control select2 mb-3" style="font-size:10px; width:100%">
@@ -132,15 +139,16 @@
 
 <!-- <div id="OtherFields"> -->
 
-<div class="mt-2" id="contact_person_div" >
+<div class="mt-2" id="contact_person_div"  style="display:none;">
 <span style="font-size:12px; font-weight:500;">Select Contact Person</span>
 <select id="contact_person" name="contact_person" class="form-control select2 mb-3"  style="font-size:12px; width:100%">
     <option value="">Select Contact</option>
 </select>
+<input type="text" name="p_id" id="p_id" value="" hidden>
 </div>
 
 <div class="mt-2">
-<span style="font-size:12px; font-weight:500;">Contact Fullname</span>
+<span style="font-size:12px; font-weight:500;">Contact Fullname</span><span class="text-danger">*</span>
 <input type="text" name="participant_name" id="participant_name" class="form-control mb-3" placeholder="Participant Name">
 </div>
 
@@ -154,8 +162,27 @@
 </div>
 
 <div class="mt-2">
-<span style="font-size:12px; font-weight:500;">Contact Number</span>
+<span style="font-size:12px; font-weight:500;">Contact Number</span><span class="text-danger">*</span>
+ <input type="radio" id="number_type" name="number_type" value="Viber">&nbsp;<i class="fab fa-viber"></i>&nbsp;Viber 
+ <input type="radio" id="number_type" name="number_type" value="Landline">&nbsp;<i class="fas fa-phone-square"></i>&nbsp;Landline 
 <input type="text" id="participant_contact" name="contact" class="form-control mb-3" maxlength="11" placeholder="Contact">
+</div>
+
+<div class="mt-2">
+    <span style="font-size:12px; font-weight:500;">Product Inquiry</span>
+
+    <select id="product_inquiry"
+            name="product_inquiry[]"
+            multiple
+            style="width:100%; min-height:150px; " class="form-control select2 mb-3">
+
+        @foreach($products as $product)
+            <option value="{{ $product->name }}">
+                {{ $product->name }}
+            </option>
+        @endforeach
+
+    </select>
 </div>
 
 
@@ -193,8 +220,23 @@ Save
 <!-- </div> -->
 
 </div>
-<script>
 
+
+
+
+<script>
+      //For Product List Display
+/* $(document).ready(function () {
+    $('#product_inquiry').select2({
+        placeholder: 'Select Products',
+        width: '100%'
+    });
+}); */
+  //Ending Product List Display
+</script>
+  
+
+<script>
 //validate if Email format
 $('#email').on('keyup blur', function () {
 
@@ -216,7 +258,7 @@ $('#email').on('keyup blur', function () {
 });
 
     //Allow integer only
-$('#contact').on('input', function () {
+$('#participant_contact').on('input', function () {
     this.value = this.value.replace(/[^0-9]/g, '');
 });
 
@@ -232,7 +274,7 @@ $('#companybtn').click(function(e){
     $('#ContactPersonDetailsDiv').show();
     $('.contact-header').css('background','linear-gradient(135deg, #ecb605, #fff3cd)');
 
-    $('#contact_person_div').show(); 
+   // $('#contact_person_div').show(); 
     $('#participantType').val('Company');
 });
 
@@ -296,6 +338,7 @@ function toggleCompanyUI(isNoCompanyChecked) {
 
         $('#CompanyDetailsDiv').hide();
         $('#ContactPersonDetailsDiv').hide();
+        $('#p_id').val('');
 
     } else {
         $('#company_id_new').hide();
@@ -315,35 +358,6 @@ $('#NoCompany').change(function () {
 
 
 $(document).ready(function(){
-
-   /*  $('#NoCompany').change(function(){
-
-        if($(this).is(':checked')){
-            $('#company_id_new').show();
-            $('#btnNewCompany').show();
-            $('#OtherFields').hide();
-            $('#company_id').next('.select2-container').hide();
-
-             $('#CompanyDetailsDiv').hide();
-             $('#ContactPersonDetailsDiv').hide();
-             
-        }else{
-            $('#company_id_new').hide();
-            $('#btnNewCompany').hide();
-            $('#company_id').next('.select2-container').show();
-            $('#OtherFields').show();
-            $('#CompanyDetailsDiv').show();
-            $('#ContactPersonDetailsDiv').show();
-        }
-
-    }); */
-
-
-
-
-
-
-
 $('#btnNewCompany').click(function(e){
 e.preventDefault();
     let companyName = $('#company_id_new').val();
@@ -388,46 +402,6 @@ e.preventDefault();
     }
 }
 
-       /*  success:function(res){
-
-       // console.log(res);
-
-            if(res.success){
-
-        let company = res.company;
-
-let newOption = new Option(
-    company.company_name,   // TEXT
-    company.id,             // VALUE
-    true,
-    true
-);
-
-        // add to select
-        $('#company_id').append(newOption);
-
-        // update select2 UI
-        $('#company_id').trigger('change');
-
-                // Reset UI
-                $('#company_id').next('.select2-container').show();
-                $('#OtherFields').show();
-              $('#company_id_new').hide();
-                $('#btnNewCompany').hide();
-
-
-                // Uncheck checkbox
-                $('#NoCompany').prop('checked', false);
-                $('#CompanyDetailsDiv').show();   
-                 $('#contact_person_div').show();
-                // Clear textbox
-                $('#company_id_new').val('');
-
-                // Show other fields
-                $('#participantFields').show();
-            }
-        } */
-
     });
 
 });
@@ -438,10 +412,10 @@ let newOption = new Option(
 let isDuplicate = false;
 
 /* Duplicate Detection */
-$('#email,#contact').on('keyup change', function(){
+$('#email,#participant_contact').on('keyup change', function(){
 
     let email   = $('#email').val();
-    let contact = $('#contact').val();
+    let contact = $('#participant_contact').val();
 
     $.ajax({
         url:'/participant/check-duplicate',
@@ -632,6 +606,9 @@ $(document).ready(function(){
     $('#company_id').on('change', function() {
 
         let company_id = $(this).val();
+        contact_person_div
+
+        $('#contact_person_div').show();
 
         if(company_id){
 
@@ -666,6 +643,7 @@ $(document).ready(function(){
             options += `<option value="${contact.id}">${contact.participant_name}</option>`;
         });
 
+     
         $('#contact_person')
             .html(options)
             .trigger('change');
@@ -728,6 +706,7 @@ $(document).ready(function(){
                     $('#email').val(data[0].participant_email);
                     $('#participant_contact').val(data[0].participant_contact);
                     $('#participant_position').val(data[0].participant_position);
+                    $('#p_id').val(data[0].id);
 
                     //$('#city_province').val(data.city_province_code).trigger('change');
                     //$('#level_type').val(data.level_type).trigger('change');
@@ -736,21 +715,6 @@ $(document).ready(function(){
                     console.log('Company Error:', xhr.responseText);
                 }
             });
-
-            // ✅ Contacts
-           /*  $.ajax({
-                url: '/get-contacts/' + company_id,
-                type: 'GET',
-                success: function(data){
-
-            let options = '<option value="">Select Contact Person</option>';
-
-
-            },
-                error: function(xhr){
-                    console.log('Contacts Error:', xhr.responseText);
-                }
-            }); */
 
         } else {
 
@@ -819,6 +783,7 @@ $('.participant-btn').click(function(){
     align-items:center;
     justify-content:center;
     gap:6px;
+    margin-bottom: 4px;
     transition:.2s;
 }
 

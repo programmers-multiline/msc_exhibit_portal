@@ -21,6 +21,7 @@ class Participants extends Model
     'participant_company',
     'participant_position',
     'participant_contact',
+    'number_type',
     'participant_source',
     'participant_address',
     'participant_remarks',
@@ -39,31 +40,39 @@ class Participants extends Model
 
     protected $table = 'participants';
 
+
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
 
+   
 
-      
-        public function images()
-        {
-            return $this->hasMany(ParticipantImage::class, 'participant_id', 'id');
-        }
+    public function getNameAndPositionAttribute()
+    {
+        return $this->participant_name . '<br><br>' . $this->participant_position;
+    }
 
-       public function updates() {
-            return $this->hasMany(ParticipantsUpdate::class, 'participant_id', 'id');
-        }
-        public function latestUpdate()
+    public function images()
+     {
+       return $this->hasMany(ParticipantImage::class, 'participant_id', 'id');
+     }
+
+    public function updates() 
+    {
+     return $this->hasMany(ParticipantsUpdate::class, 'participant_id', 'id');
+    }
+
+    public function latestUpdate()
     {
         return $this->hasOne(\App\Models\ParticipantsUpdate::class, 'participant_id')
                     ->latest('update_date'); // pinaka-bagong entry
     }
 
-        public function files()
-        {
-            return $this->hasMany(ParticipantFile::class, 'participant_id');
-        }
+    public function files()
+    {
+        return $this->hasMany(ParticipantFile::class, 'participant_id');
+    }
 
        
 

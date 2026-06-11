@@ -172,8 +172,54 @@ Save Assignment
     </div>
   </div>
 </div>
-
 <!-- Ending of Modal Update Address Modal -->
+
+
+<!-- Modal to update Contact Person Details Modal -->
+ <div class="modal fade" id="ContactPersonUpdateModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title">Update Contact Details Form</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="p_id">
+         <p id="contact_company_name" class="bg bg-success text-white p-2"></p>   
+    
+
+        <div class="mb-3">
+            <label>Fullname</label>
+            <input type="text" class="form-control" id="participant_name">
+        </div>
+
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="text" class="form-control" id="participant_email">
+        </div>
+
+        <div class="mb-3">
+            <label>Contact#</label>
+            <input type="text" class="form-control" id="participant_contact">
+        </div>
+
+        
+
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" id="SaveContactUpdates">
+            Save
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- Ending update Contact Person Details Modal -->
 
 <style>
 .participant_checkbox{
@@ -311,27 +357,18 @@ $('#bulkAssignBtn').click(function(){
 
 //Use to view Photo in carousel design
 $(document).on('click','.viewImages', function(){
-
     let participant_id = $(this).data('participant-id');
-
     $.get("/participants/images/"+participant_id, function(images){
-
         let html = '';
-
         $.each(images, function(i,img){
-
             html += `
             <div class="carousel-item ${i === 0 ? 'active' : ''}">
                 <img src="/storage/participants/${img.image_name}" class="d-block w-100">
             </div>`;
         });
-
         $('#carouselImages').html(html);
-
         $('#imageCarouselModal').modal('show');
-
     });
-
 });
 
 
@@ -339,114 +376,6 @@ let companiesData = []; // store AJAX response globally
 let viewAllMode = false;
 
 // Load Companies
-/*
-function loadCompanies(url = "/company_card/list?page=1") {
-    $.ajax({
-        url: url,
-        type: "GET",
-        data: {
-            search: $('#companySearch').val(),
-            view_all: viewAllMode ? 1 : 0
-        },
-        beforeSend: function(){
-            $('#companyList').html('<div class="text-center w-100">Loading...</div>');
-        },
-        success: function(response){
-            companiesData = response.data;
-            let html = '';
-
-            response.data.forEach(company => {
-                let participants = company.participants ?? [];
-                let contactHtml = '';
-
-                // Build contact HTML with images per participant
-                participants.forEach((c, index) => {
-                    let imagesHtml = '';
-                    if(c.images && c.images.length > 0){
-                        let img = c.images[0]; // first thumbnail
-                        imagesHtml += `<img src="/storage/participants/${img.image_name}" alt="${c.participant_name}" 
-                        class="img-thumbnail participant-img viewImages" style="width:60px; height:60px;" data-participant-id="${img.participant_id}">`;
-                    } else {
-                        imagesHtml = '<div class="text-muted">No images</div>';
-                    }
-
-                    contactHtml += `
-                        <div class="mb-2">
-                            <strong>${index + 1}. ${c.participant_name ?? ''}</strong><br>
-                            📞 ${c.participant_contact ?? ''}<br>
-                            📧 ${c.participant_email ?? ''}<br>
-                            📍  ${c.participant_address ?? ''}<br>
-                           
-                               ${imagesHtml}
-                        </div>
-                        <hr>
-                    `;
-                });
-
-                // Build Latest Update HTML per company
-              let latestUpdateHtml = '';
-
-if(company.latest_updates && company.latest_updates.length > 0){
-    company.latest_updates.forEach(update => {
-        latestUpdateHtml += `
-            <div class="latest-update border p-2 mb-2">
-                <span><strong>Status:</strong> ${update.lead_status}</span><br>
-                <span><strong>Date:</strong> ${update.update_date}</span>
-            </div>
-        `;
-    });
-} else {
-    latestUpdateHtml = '<p>No updates yet.</p>';
-}
-
-                // Agent Details
-                let agentHtml = '';
-                if(company.assigned_agent){
-                    agentHtml = `
-                        <div class="alert alert-success p-2" id="AssignedPSC">
-                            👤 ${company.assigned_agent.psc_name ?? 'N/A'} <br>
-                            🆔 ${company.assigned_agent.psc_emp_id ?? 'N/A'}
-                        </div>
-                    `;
-                } else {
-                    agentHtml = `<div class="text-muted">No Agent Assigned</div>`;
-                }
-
-                // Build company card
-                html += `
-                    <div class="col-md-4 mb-4">
-                        <div class="card shadow-sm h-100 border-0">
-                            <div class="card-body">
-                                <h5 class="text-primary font-weight-bold ">${company.company_name ?? ''} </h5>
-                                - ${company.id}
-                                <i class="far fa-building"></i>
-                                <span style="font-size:12px; color: green; font-style: italic; " class="mb-3">${company.address ?? 'No Address'}</span>
-                                <i class="fas fa-edit text-secondary " style="cursor:pointer;" title="Click to Update Address" id="UpdateAddressModal" data-c_id="${company.id}" data-company_name="${company.company_name}"></i><br>
-                                <input type="checkbox" class="participant_checkbox mt-3" value="${company.id ?? ''}">
-                                <span style="font-size:10px; color: red; font-style: italic;"> Check to Assigned Agent</span>
-                                ${contactHtml}
-                            </div>
-                            <div class="card-body">
-                                <h6>Agent Details</h6>
-                                <hr>
-                                ${agentHtml}
-                                <p>Latest Update</p>
-                                ${latestUpdateHtml}
-                               
-                                <button class="btn btn-sm btn-secondary btnUpdateStatus" data-id="${company.id}" data-cname="${company.company_name ?? ''}">Update Status</button>
-                                <button class="btn btn-sm btn-warning btnAddContact" data-id="${company.id}">Add Contact</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            $('#companyList').html(html);
-            buildPagination(response);
-            $('#summary').html(`Showing ${response.from} - ${response.to} of ${response.total} companies`);
-        }
-    });
-}*/
 function loadCompanies(url = "/company_card/list?page=1") {
     $.ajax({
         url: url,
@@ -503,6 +432,21 @@ function loadCompanies(url = "/company_card/list?page=1") {
                             </div>
 
                             ${imagesHtml}
+
+                            <div class="small text-right">
+                                 <button
+                                    type="button"
+                                    id="UpdateContact"
+                                    class="btn btn-sm btn-secondary btn-edit-contact"
+                                    data-companyname="${company.company_name}"
+                                    data-id="${c.id}"
+                                    data-name="${c.participant_name ?? ''}"
+                                    data-contact="${c.participant_contact ?? ''}"
+                                    data-email="${c.participant_email ?? ''}"
+                                    data-address="${c.participant_address ?? ''}">
+                                    ✏️ Edit
+                                </button>
+                            </div>
                         </div>
                     `;
                 });
@@ -871,6 +815,31 @@ $(document).on('click', '#UpdateAddressModal', function(){
 });
 
 
+
+//Use to open the Modal Updating Contact Person Form
+//By Clicking the Edit BUtton per Contact
+$(document).on('click', '#UpdateContact', function(){
+
+    var p_id        = $(this).data('id');
+    var companyname = $(this).data('companyname');
+    var name        = $(this).data('name');
+    var email       = $(this).data('email');
+    var contact     = $(this).data('contact');
+
+    console.log(companyname);
+    //alert(company_name)
+
+    $('#contact_company_name').text(companyname);
+    $('#p_id').val(p_id);
+    $('#participant_name').val(name);
+    $('#participant_email').val(email);
+    $('#participant_contact').val(contact);
+
+    
+    $('#ContactPersonUpdateModal').modal('show');
+});
+
+
 //Use to update CompanyAddress
 $('#saveAddress').click(function(){
 
@@ -901,6 +870,50 @@ $('#saveAddress').click(function(){
                  });
             $('#AddressModal').modal('hide');
             $('#Address').val('');
+          //  loadCompanies();
+          //$('#CompanyTbl').DataTable().ajax.reload();
+          loadCompanies();
+        }
+    });
+
+});
+
+
+//Use to update Contact Person Details
+$('#SaveContactUpdates').click(function(){
+
+    let p_id                = $('#p_id').val();
+    let participant_name    = $('#participant_name').val();
+    let participant_email   = $('#participant_email').val();
+    let participant_contact = $('#participant_contact').val();
+
+    $.ajax({
+        url: '/companies/update-contactdetails',
+        type: 'POST',
+        data: {
+            _token             : '{{ csrf_token() }}',
+            p_id               : p_id,
+            participant_name   : participant_name,
+            participant_email  : participant_email,
+            participant_contact: participant_contact
+   
+        },
+        success: function(response){
+          //  $('#CompanyTbl').DataTable().ajax.reload(null, false);
+           // alert('Address updated!');
+            Swal.fire({
+                icon             : 'success',
+                title            : 'Saved!',
+                text             : 'Contact Details has been updated!',
+                timer            : 2000,
+                showConfirmButton: false,
+                toast            : true,
+                position         : 'top-center'
+                 });
+            $('#ContactPersonUpdateModal').modal('hide');
+            $('#participant_name').val('');
+            $('#participant_email').val('');
+            $('#participant_contact').val('');
           //  loadCompanies();
           //$('#CompanyTbl').DataTable().ajax.reload();
           loadCompanies();

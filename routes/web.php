@@ -45,6 +45,9 @@ Route::get('/client_card', [CustomerList::class, 'client_card']);
 Route::get('/client/Cardlist', [CustomerList::class, 'ClientCardList']);
 
 Route::post('/companies/update-address', [CompanyController::class, 'updateAddress']);
+Route::post('/companies/update-contactdetails', [CompanyController::class, 'UpdateContactDetails']);
+
+
 
 Route::get('/external-login', [UserLoginController::class, 'showLogin']);
 Route::post('/login', [UserLoginController::class, 'login']);

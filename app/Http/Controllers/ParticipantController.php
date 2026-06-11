@@ -24,6 +24,7 @@ use App\Models\Company;
 use Illuminate\Support\Facades\Mail;
 use App\Models\User;
 use App\Models\ParticipantFile;
+use App\Models\product_list;
 
 
 
@@ -31,17 +32,13 @@ use App\Models\ParticipantFile;
 class ParticipantController extends Controller
 {
 
-   public function index(Request $request)
+  /*  public function index(Request $request)
     {
-        // dd(session('user')); // test session
-        // If request is ajax (DataTable request)
+       
         if ($request->ajax()) {
 
-            /* return DataTables::of(Participants::query())
-                ->addIndexColumn()
-                ->make(true); */
-
-             return DataTables::of(Participants::with('images')->orderBy('id', 'desc'))
+            return DataTables::of(Participants::with(['images', 'company'])->orderBy('id', 'desc'))
+            //Participants::with(['images', 'company'])->orderBy('id', 'desc')
 
                ->addColumn('checkbox', function($row){
                     // ✅ If may assigned PSC → display PSC name
@@ -77,6 +74,10 @@ class ParticipantController extends Controller
 
                 })
 
+               ->addColumn('name_position', function($row){
+    return $row->participant_name . '<br>' . $row->participant_position;
+})
+
               ->addColumn('action', function($row){
 
                     $status      = $row->status ?? 'N/A';
@@ -111,15 +112,122 @@ class ParticipantController extends Controller
                             </div>
                         ';
                     })
-
-               ->rawColumns(['checkbox','participant_photo','action'])
+              
+               ->rawColumns(['name_position','checkbox','participant_photo','action'])
                 ->make(true);
         }
   $users = ExternalUser::getUsersWithCompanyAndDepartment();
 
     return view('participants.index', compact('users'));
        // return view('participants.index');
+    } */
+
+       public function index(Request $request)
+{
+    if ($request->ajax()) {
+
+        $participants = Participants::select(
+        'participants.*',
+        'company_list.company_name as company_name',
+        'users.name as entry_by_name'
+    )
+            ->leftJoin('company_list', 'participants.company_id', '=', 'company_list.id')
+            ->leftJoin('users', 'participants.entry_by', '=', 'users.emp_id')
+            ->with('images')
+            ->orderBy('participants.id', 'desc');
+
+        return DataTables::of($participants)
+
+            ->addColumn('checkbox', function($row){
+
+                if (!empty($row->assigned_psc)) {
+                    return '<span class="badge bg-success text-white">
+                                PSC: '.$row->assigned_psc.'
+                            </span>';
+                }
+
+                return '<input type="checkbox"
+                        class="participant_checkbox"
+                        value="'.$row->id.'">';
+            })
+
+            ->addColumn('participant_photo', function($row){
+
+                if ($row->images->count() > 0) {
+
+                    $img = $row->images->first();
+
+                    return '<img
+                        src="'.asset('storage/participants/'.$img->image_name).'"
+                        width="30"
+                        height="30"
+                        class="img-thumbnail viewImages"
+                        data-id="'.$row->id.'"
+                        style="cursor:pointer">';
+                }
+
+                return 'No Image';
+            })
+
+            ->addColumn('name_position', function($row){
+                return $row->participant_name . '<br>' . $row->participant_position;
+            })
+
+            // ✅ NEW COLUMN: COMPANY NAME
+            ->addColumn('company_name', function($row){
+                return $row->company_name ?? 'No Company';
+            })
+
+            ->addColumn('action', function($row){
+
+                $status      = $row->status ?? 'N/A';
+                $description = $row->description ?? 'N/A';
+                $lastUpdate  = $row->last_update_date
+                    ? date('Y-m-d H:i', strtotime($row->last_update_date))
+                    : 'N/A';
+
+                return '
+                    <div style="min-width:250px">
+                        <div>
+                            <strong>Status:</strong>
+                            <span class="badge bg-info text-white">'.$status.'</span>
+                        </div>
+
+                        <div>
+                            <strong>Description:</strong>
+                            <span>'.$description.'</span>
+                        </div>
+
+                        <div>
+                            <strong>Last Update:</strong>
+                            <span>'.$lastUpdate.'</span>
+                        </div>
+
+                        <hr>
+
+                        <button
+                            class="btn btn-sm btn-primary btnUpdateStatus"
+                            data-id="'.$row->id.'">
+                            Update Status
+                        </button>
+                    </div>
+                ';
+            })
+
+            ->rawColumns([
+                'checkbox',
+                'participant_photo',
+                'name_position',
+                'company_name',
+                'action'
+            ])
+            ->make(true);
     }
+
+    $users = ExternalUser::getUsersWithCompanyAndDepartment();
+
+    return view('participants.index', compact('users'));
+}
 
 public function create(Request $request)
 {
@@ -139,6 +247,7 @@ public function create(Request $request)
     ->orderBy('address_name', 'ASC')
     ->get();
 
+  
 
     $selected_company_id   = $request->company_id;
     $selected_company_name = $request->company_name;
@@ -165,10 +274,14 @@ public function add_participant(Request $request)
     ->get();
 
 
+      //For Product List Display
+$products = \App\Models\ProductList::orderBy('name')->get();
+    //Ending Product List Display
+
     $selected_company_id   = $request->company_id;
     $selected_company_name = $request->company_name;
-
-    return view('participants.add_participant', compact('companies','users','selected_company_id','addresses','selected_company_name'));
+//dd($products);
+    return view('participants.add_participant', compact('companies','users','selected_company_id','addresses','selected_company_name','products'));
 }
 
 
@@ -698,22 +811,7 @@ public function search(Request $request)
 {
     $search = $request->search;
 
-   /*  $contacts = Participants::query()
-
-        ->when($search, function($query) use ($search){
-
-            $query->where('participant_name', 'like', "%$search%")
-                  ->orWhere('participant_email', 'like', "%$search%")
-                  ->orWhere('participant_company', 'like', "%$search%")
-                  ->orWhere('assigned_psc', 'like', "%$search%");
-
-        })
-        ->orderBy('participant_name')
-        ->limit(50) // ⭐ Performance optimization
-        ->get();
- */
-
-        $contacts = Participants::query()
+$contacts = Participants::query()
     ->when($search, function($query) use ($search) {
         $query->where(function($q) use ($search) {
             $q->where('participant_name', 'like', "%$search%")
@@ -730,97 +828,7 @@ public function search(Request $request)
     return response()->json($contacts);
 }
 
-/* public function storeAjax(Request $request)
-{
-    $request->validate([
-        'company_id'       => 'required',
-        'participant_name' => 'required'
-    ]);
 
-    $user = Auth::user();
-
-    $participant = \App\Models\Participants::create([
-        'company_id'           => $request->company_id,
-        'entry_by'             => $user->emp_id,
-        'day_num'              => now()->setTimezone('Asia/Manila')->format('Y-m-d'),
-        'participant_name'     => $request->participant_name,
-        'participant_email'    => $request->email,
-        'participant_contact'  => $request->contact,
-        'participant_position' => $request->participant_position,
-        'participant_source'   => $request->participant_source,
-        'participant_address'  => $request->address,
-        'participant_remarks'  => $request->participant_remarks,
-        'exhibit_name'         => $request->exhibit_name,
-        'level_type'           => $request->level_type,
-        'entry_from'           => 'Online'
-    ]);
-
-
-      // Query Builder
-DB::table('attendees_list')->insert([
-    'company_id'    => $request->company_id,
-    'exhibit_name'  => $request->exhibit_name,
-    'year_attended' => now()->setTimezone('Asia/Manila')->format('Y-m-d'),
-    'exhibit_name'  => $request->exhibit_name,
-    'encoded_by'    => $user->emp_id,
-    'created_at'    => now(),
-    'updated_at'    => now(),
-]);
-
-      // Upload images
-    $uploadCount = 0;
-
-    if ($request->hasFile('participant_photo')) {
-
-        foreach ($request->file('participant_photo') as $file) {
-
-            if ($file->isValid()) {
-
-                $path     = $file->store('participants', 'public');
-                $filename = basename($path);
-
-                $image = ParticipantImage::create([
-                    'participant_id' => $participant->id,
-                    'image_name'     => $filename
-                ]);
-
-                if ($image) {
-                    $uploadCount++;
-                }
-
-            }
-
-        }
-
-    }
-
-    if ($uploadCount > 0) {
-        $UploadStatus = $uploadCount . " image(s) uploaded successfully";
-    } else {
-        $UploadStatus = "No image uploaded";
-    }
-
-      // Send email
-    try {
-
-        Mail::to($request->email)
-            ->queue(new ParticipantBrochureMail($participant));
-
-        $emailStatus = "Email queued successfully";
-
-    } catch (\Exception $e) {
-
-        $emailStatus = "Email failed: ".$e->getMessage();
-
-    }
-
-    return response()->json([
-        'success'      => true,
-        'email_status' => $emailStatus,
-        'UploadStatus' => $UploadStatus,
-        'message'      => 'Participant saved successfully'
-    ]);
-} */
 
 public function storeAjax(Request $request)
 {
@@ -835,32 +843,72 @@ public function storeAjax(Request $request)
     DB::beginTransaction();
 
     try {
+             //Get active exhibit name
+                $activeExhibit = DB::table('exhibit_names')
+                 ->where('exhibit_status', 'Active')
+                 ->first();
+            //ending of Exhibit name
 
-        // 1. Insert participant
-        $participant = \App\Models\Participants::create([
-           'company_id'           => $request->company_id,
-           'entry_by'             => $user->emp_id,
-           'day_num'              => now()->setTimezone('Asia/Manila')->format('Y-m-d'),
-           'participant_type'     => $request->participant_type,
-           'participant_name'     => $request->participant_name,
-           'participant_email'    => $request->email,
-           'participant_contact'  => $request->contact,
-           'participant_position' => $request->participant_position,
-           'participant_source'   => $request->participant_source,
-           'participant_address'  => $request->address,
-           'participant_remarks'  => $request->participant_remarks,
-           'exhibit_name'         => $request->exhibit_name,
-           'level_type'           => $request->level_type,
-           'entry_from'           => 'Online'
+
+        if ($request->p_id) {
+
+    // UPDATE
+    $participant = \App\Models\Participants::find($request->p_id);
+
+    if ($participant) {
+        $participant->update([
+            'company_id'           => $request->company_id,
+            'entry_by'             => $user->emp_id,
+            'day_num'              => now()->setTimezone('Asia/Manila')->format('Y-m-d'),
+            'participant_type'     => $request->participant_type,
+            'participant_name'     => $request->participant_name,
+            'participant_email'    => $request->email,
+            'participant_contact'  => $request->contact,
+            'number_type'          => $request->number_type,
+            'participant_position' => $request->participant_position,
+            'participant_source'   => $request->participant_source,
+            'participant_address'  => $request->address,
+            'participant_remarks'  => $request->participant_remarks,
+            'exhibit_name'         => $activeExhibit?->exhibit_name,
+            'level_type'           => $request->level_type,
+            'entry_from'           => 'Online'
         ]);
+    }
+
+} else {
+
+    // INSERT
+    $participant = \App\Models\Participants::create([
+        'company_id'           => $request->company_id,
+        'entry_by'             => $user->emp_id,
+        'day_num'              => now()->setTimezone('Asia/Manila')->format('Y-m-d'),
+        'participant_type'     => $request->participant_type,
+        'participant_name'     => $request->participant_name,
+        'participant_email'    => $request->email,
+        'participant_contact'  => $request->contact,
+        'number_type'          => $request->number_type,
+        'participant_position' => $request->participant_position,
+        'participant_source'   => $request->participant_source,
+        'participant_address'  => $request->address,
+        'participant_remarks'  => $request->participant_remarks,
+        'exhibit_name'         => $activeExhibit?->exhibit_name,
+        'level_type'           => $request->level_type,
+        'entry_from'           => 'Online'
+    ]);
+}
+//dd($request->all());
+        //dd($request->product_inquiry);
+    $productInquiry = collect($request->product_inquiry ?? [])->implode(', ');
 
         // 2. Insert attendees_list
         DB::table('attendees_list')->insert([
             'company_id'       => $request->company_id,
-            'exhibit_name'     => $request->exhibit_name,
-           
+            'participant_id'   => $participant->id,
+            'exhibit_name'     => $activeExhibit?->exhibit_name,
             'year_attended'    => now()->format('Y-m-d'),
+            'product_inquiry'  => $productInquiry,
             'encoded_by'       => $user->emp_id,
+            'agent_company_id' => $user->company_id,
             'created_at'       => now(),
             'updated_at'       => now(),
         ]);
