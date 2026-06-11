@@ -4,7 +4,7 @@
 
 <div class="card-box mb-30 p-3 ml-15">
 
-    <h4 class="mb-3">Participantsrrrr</h4>
+    <h4 class="mb-3">Participants</h4>
     <button class="btn btn-sm btn-primary mb-2" data-toggle="modal" data-target="#addParticipantModal">Add Participant</button>
     <button class="btn btn-sm btn-success mb-2" id="bulkAssignBtn">Assign PSC</button>
     <button class="btn btn-sm btn-success mb-2" data-toggle="modal" data-target="#importModal">Import Excel</button>
