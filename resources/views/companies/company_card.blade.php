@@ -602,8 +602,9 @@ if (company.latest_updates && company.latest_updates.length > 0) {
                                     <div class="bg-primary text-white rounded px-3 py-2 mb-3">
                                         Company Contacts
                                     </div>
-
+                                    <div class="scrollable_div" style="height: 300px; overflow-y: auto;">
                                     ${contactHtml}
+                                    </div>  <!-- Ending of Scrollable Div -->
                                 </div>
 
                                 <!-- AGENT DETAILS -->
