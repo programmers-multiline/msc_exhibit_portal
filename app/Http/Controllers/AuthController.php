@@ -16,6 +16,8 @@ public function login(Request $request)
         ->where('username', $request->username)
         ->first();
 
+        //dd($user);
+
     if($user && $user->password == $request->password){
 
         session([

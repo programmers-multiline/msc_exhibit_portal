@@ -129,27 +129,41 @@ class ParticipantController extends Controller
         $participants = Participants::select(
         'participants.*',
         'company_list.company_name as company_name',
-        'users.name as entry_by_name'
+        'users.name as entry_by_name',
+        'assigned_agent.psc_name  as psc_name'
     )
             ->leftJoin('company_list', 'participants.company_id', '=', 'company_list.id')
             ->leftJoin('users', 'participants.entry_by', '=', 'users.emp_id')
+            ->leftJoin('assigned_agent','participants.assigned_psc','=','assigned_agent.psc_emp_id')
             ->with('images')
             ->orderBy('participants.id', 'desc');
 
         return DataTables::of($participants)
 
-            ->addColumn('checkbox', function($row){
 
+
+        ->addColumn('checkbox', function($row){
+
+                // 1. Check kung may assigned PSC
                 if (!empty($row->assigned_psc)) {
                     return '<span class="badge bg-success text-white">
-                                PSC: '.$row->assigned_psc.'
+                                PSC: '.$row->psc_name.'
                             </span>';
                 }
 
-                return '<input type="checkbox"
-                        class="participant_checkbox"
-                        value="'.$row->id.'">';
-            })
+                // 2. Check kung ang position_id ng naka-login na user ay 13
+                else if (auth()->user()->position_id == 13) {
+                    return '<input type="checkbox"
+                            class="participant_checkbox"
+                            value="'.$row->id.'">';
+                }
+
+                // 3. Default kapag hindi pumasa sa mga condition sa itaas
+                else {
+                    return '--';
+                }
+
+                })
 
             ->addColumn('participant_photo', function($row){
 
@@ -329,97 +343,7 @@ public function getImages($id)
 }
 
 //Use to update the Status of Exhibit Attendee
-/* public function updateStatus(Request $request, $id)
-{
-    try {
-
-        DB::beginTransaction();
-
-        $participant = Participants::findOrFail($id);
-        $user        = Auth::user();
-        ParticipantsUpdate::create([
-            'participant_id' => $id,
-            'status'         => $request->status,
-            'description'    => $request->description,
-            'updated_by'     => $user->emp_id,
-            'update_date'    => now()
-        ]);
-
-        $participant->update([
-            'last_update_date' => now(),
-            'status'           => $request->status,
-            'assigned_psc'     => $user->emp_id,
-            'description'      => $request->description
-           
-        ]);
-
-        DB::commit();
-
-        return response()->json(['success' => true]);
-
-    } catch(\Exception $e) {
-
-        DB::rollback();
-
-        return response()->json([
-            'error' => $e->getMessage()
-        ], 500);
-    }
-} */
 // Uploading ng file on the same table
-/* public function updateStatus(Request $request, $id)
-{
-    try {
-
-        //yung 9 is the value Id ng Selected Option Status
-        $request->validate([
-            'status'               => 'required',
-            'signed_proposal_file' => 'required_if:status,9|file|mimes:pdf,jpg,png,jpeg|max:2048'
-        ]);
-
-        DB::beginTransaction();
-
-        $participant = Participants::findOrFail($id);
-        $user        = Auth::user();
-
-        $filePath = null;
-
-        if ($request->hasFile('signed_proposal_file')) {
-            $filePath = $request->file('signed_proposal_file')
-                ->store('signed_proposals', 'public');
-        }
-
-        ParticipantsUpdate::create([
-            'participant_id' => $id,
-            'status'         => $request->status,
-            'description'    => $request->description,
-            'updated_by'     => $user->emp_id,
-            'update_date'    => now(),
-            'uploaded_file'  => $filePath
-        ]);
-
-        $participant->update([
-            'last_update_date' => now(),
-            'status'           => $request->status,
-            'assigned_psc'     => $user->emp_id,
-            'description'      => $request->description,
-            'uploaded_file'    => $filePath
-        ]);
-
-        DB::commit();
-
-        return response()->json(['success' => true]);
-
-    } catch(\Exception $e) {
-
-        DB::rollback();
-
-        return response()->json([
-            'error' => $e->getMessage()
-        ], 500);
-    }
-} */
-
     public function updateStatus(Request $request, $id)
 {
     //Nilabas ko ito for better error return result
@@ -503,106 +427,6 @@ public function getImages($id)
 
 
 //Use to Assigned PSC
-/* public function bulkAssign(Request $request)
-{
-    $request->validate([
-        'participants' => 'required|array',
-        'psc_id'       => 'required'
-        
-    ]);
-
-
-    //return $request;
-    DB::beginTransaction();
-
-    try {
-
-        $data = [];
-        $user = Auth::user();
-        foreach ($request->participants as $participant_id) {
-                        $data[] = [
-                'company_id'  => $participant_id,
-                'psc_emp_id'  => $request->psc_id,
-                'psc_name'    => $request->psc_name,
-                'assigned_by' => $user->emp_id,
-                'created_at'  => now(),
-                'updated_at'  => now()
-            ];
-        }
-
-        AssignedAgent::insert($data);
-
-        DB::commit();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'PSC Assigned Successfully'
-        ]);
-
-    } catch (\Exception $e) {
-
-        DB::rollback();
-
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage()
-        ], 500);
-    }
-} */
-/* public function bulkAssign(Request $request)
-{
-    $request->validate([
-        'participants' => 'required|array',
-        'psc_id'       => 'required'
-    ]);
-
-    DB::beginTransaction();
-
-    try {
-
-        $data = [];
-        $user = Auth::user();
-
-        // 🔥 KUNIN ANG NAME BASED SA ID
-        $psc = User::where('emp_id', $request->psc_id)->first();
-
-        if (!$psc) {
-            throw new \Exception('PSC not found');
-        }
-
-        $psc_name = $psc->first_name . ' ' . $psc->last_name;
-
-        foreach ($request->participants as $participant_id) {
-            $data[] = [
-                'company_id'  => $participant_id,
-                'psc_emp_id'  => $request->psc_id,
-                'psc_name'    => $psc_name,
-                'assigned_by' => $user->emp_id,
-                'created_at'  => now(),
-                'updated_at'  => now()
-            ];
-        }
-
-        AssignedAgent::insert($data);
-
-        DB::commit();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'PSC Assigned Successfully'
-        ]);
-
-    } catch (\Exception $e) {
-
-        DB::rollback();
-
-        return response()->json([
-            'success' => false,
-            'message' => $e->getMessage()
-        ], 500);
-    }
-} */
-
 public function bulkAssign(Request $request)
 {
     $request->validate([
@@ -651,6 +475,14 @@ public function bulkAssign(Request $request)
                     'updated_at'  => now()
                 ]);
               // dd($request->psc_id); 
+
+              //Update assigned PSC
+            $participantIds = $request->participants;
+            $pscId          = $request->psc_id;
+                Participants::whereIn('id', $participantIds)
+                ->update([
+                    'assigned_psc' => $pscId 
+                        ]);
 
             } else {
 

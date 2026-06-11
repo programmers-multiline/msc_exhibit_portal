@@ -322,7 +322,8 @@ $(document).on('click','.btnAddContact', function(){
 
     let companyId = $(this).data('id');
 
-    window.location.href ="http://127.0.0.1:8000/participant/create?company_id=" + companyId;
+    //window.location.href ="http://127.0.0.1:8000/participant/create?company_id=" + companyId;
+     window.location.href = "/participant/create?company_id=" + companyId;
 
 });
 
@@ -411,11 +412,15 @@ function loadCompanies(url = "/company_card/list?page=1") {
                         imagesHtml = `<div class="text-muted small mt-2">No Images</div>`;
                     }
 
+                        //dahil naka ALL CAPS sa DB, need ma force maging lowercase lahat, then CSS ang mag Capitalize
+                   c.participant_name    = c.participant_name.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                   //c.participant_address = c.participant_address.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+
                     contactHtml += `
                         <div class="border rounded p-3 mb-3 bg-light">
                             <small class="text-muted fw-bold">Contact Person ${index + 1}</small>
 
-                            <div class="fw-bold fs-6 mt-1">
+                            <div class="fw-bold fs-6 mt-1" style="" id="CapitaLized">
                                 ${c.participant_name ?? ''}
                             </div>
 
@@ -427,7 +432,7 @@ function loadCompanies(url = "/company_card/list?page=1") {
                                 📧 ${c.participant_email ?? '-'}
                             </div>
 
-                            <div class="small">
+                            <div class="small" >
                                 📍 ${c.participant_address ?? '-'}
                             </div>
 
@@ -437,7 +442,7 @@ function loadCompanies(url = "/company_card/list?page=1") {
                                  <button
                                     type="button"
                                     id="UpdateContact"
-                                    class="btn btn-sm btn-secondary btn-edit-contact"
+                                    class="btn btn-sm btn btn-outline-secondary btn-edit-contact"
                                     data-companyname="${company.company_name}"
                                     data-id="${c.id}"
                                     data-name="${c.participant_name ?? ''}"
@@ -457,10 +462,20 @@ function loadCompanies(url = "/company_card/list?page=1") {
                     console.log(company.latest_updates[0]);
                     company.latest_updates.forEach(update => {
                         latestUpdateHtml += `
-                            <div class="border-start border-4 border-warning ps-3 py-2 bg-light rounded-end mb-2">
-                                <span class="badge bg-success mb-2">
-                                    ${update.lead_status}
-                                </span>
+                            <div class="border-start border-4  p-4 ps-3 py-2 bg-light rounded-end mb-2">
+                               
+                                <div id="w-100">
+                                    Status Update: <span class="badge bg-success text-white mb-2">${update.lead_status}</span>
+                                </div>
+
+                                <div id="w-100">
+                                    <h6>Remarks</h6>
+                                </div>
+
+                                <div id="w-100">
+                                    <p class="font-italic mb-2">${update.description}</p>
+                                </div>
+                            
 
                                 <div class="small text-muted">
                                     ${update.update_date}
@@ -470,7 +485,7 @@ function loadCompanies(url = "/company_card/list?page=1") {
                     });
                 } else {
                     latestUpdateHtml = `
-                        <div class="text-muted small">
+                        <div class="text-muted small p-4">
                             No updates yet.
                         </div>
                     `;
@@ -480,19 +495,20 @@ function loadCompanies(url = "/company_card/list?page=1") {
 
                 if(company.assigned_agent){
                     agentHtml = `
-                                <div class="d-flex align-items-center gap-3 border rounded-3 p-3 bg-success bg-opacity-10">
-                                    <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center"
+                                <div class="d-flex align-items-center gap-3 border rounded-3 p-3  bg-opacity-10">
+                                    <div class=" bg bg-success rounded-circle  text-white d-flex align-items-center justify-content-center"
                                         style="width:45px;height:45px;">
                                         <i class="fas fa-user"></i>
+                                        
                                     </div>
 
                                     <div>
-                                        <div class="fw-bold">
-                                            ${company.assigned_agent.psc_name ?? 'N/A'}
+                                        <div class="fw-bold ms-4">
+                                            &nbsp;${company.assigned_agent.psc_name ?? 'N/A'}
                                         </div>
 
-                                        <small class="text-muted">
-                                            ID: ${company.assigned_agent.psc_emp_id ?? 'N/A'}
+                                        <small class="text-muted ms-4">
+                                           &nbsp; ID: ${company.assigned_agent.psc_emp_id ?? 'N/A'}
                                         </small>
                                     </div>
                                 </div>
@@ -545,17 +561,14 @@ if (company.latest_updates && company.latest_updates.length > 0) {
                             <div class="card-body">
 
                                 <!-- COMPANY HEADER -->
-                                <div class="p-3 text-white rounded-4 mb-3" style="background: linear-gradient(135deg,#0d6efd,#6610f2);">
+                                <div class="p-3 text-white rounded-4 mb-3 company-header-card ">
+                                    <div class="d-flex justify-content-between align-items-center">
                                     <h5 class="fw-bold text-white mb-1">
-                                        ${company.company_name ?? ''}
+                                        ${company.company_name ?? ''} 
                                     </h5>
-
-                                    <div class="small text-light">
-                                        #${company.id}
-                                        <i class="far fa-building ms-1"></i>
+                                    <i class="far fa-building ms-1 text-white h3"></i>
                                     </div>
 
-                                    
                                     <div class="small text-white-50 fst-italic mt-1">
                                         ${company.address ?? 'No Address'}
                                         <i class="fas fa-edit text-secondary ms-2"
@@ -569,38 +582,46 @@ if (company.latest_updates && company.latest_updates.length > 0) {
                                 </div>
                                 
                                 <!-- Progress Bar -->
-                             <div class="mb-4">
-                                <small class="text-muted fw-bold">Lead Pipeline</small>
+                             <div class="p-3 bg-white border rounded-3 mb-3 shadow-sm">
+    
+    <!-- Row para sa Label at Progresyong Porsyento -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <span class="fw-bold text-dark fs-6" style="letter-spacing: -0.3px;">Lead Pipeline</span>
+        <span class="small fw-semibold text-secondary">[ ${progressPercent}% ]</span>
+    </div>
 
-                                <div class="progress mt-2" style="height:10px;">
-                                    <div class="progress-bar ${progressColor}"
-                                        role="progressbar"
-                                        style="width:${progressPercent}%">
-                                    </div>
-                                </div>
+    <!-- Ang Gradient Progress Bar System -->
+    <div class="progress rounded-pill mb-3" style="height: 6px; background-color: #f1f3f5;">
+        <div class="progress-bar rounded-pill" 
+             role="progressbar" 
+             style="width: ${progressPercent}%; background: linear-gradient(90deg, #0d6efd, #6610f2);" 
+             aria-valuenow="${progressPercent}" 
+             aria-valuemin="0" 
+             aria-valuemax="100">
+        </div>
+    </div>
 
-                                <small class="fw-bold text-muted">
-                                    ${progressLabel} (${progressPercent}%)
-                                </small>
-                            </div>
-                                
+    <!-- Ang Assign Checkbox Layout sa Ibaba -->
+    <div class="d-flex align-items-center mt-1">
+        <input type="checkbox"
+               class="participant_checkbox me-2"
+               value="${company.id}"
+               id="check_${company.id}">&nbsp;
+        <label class="small text-danger fw-medium style-pointer mb-0" 
+               style="cursor: pointer; font-size: 0.85rem;" 
+               for="check_${company.id}">
+            Check to Assign Agent
+        </label>
+    </div>
 
-
-
-                                <!-- ASSIGN CHECKBOX -->
-                                <div class="mb-4">
-                                    <input type="checkbox"
-                                           class="participant_checkbox"
-                                           value="${company.id}">
-                                    <small class="text-danger fst-italic">
-                                        Check to Assign Agent
-                                    </small>
-                                </div>
+</div>
 
                                 <!-- CONTACT PERSONS -->
-                                <div class="mb-4">
-                                    <div class="bg-primary text-white rounded px-3 py-2 mb-3">
-                                        Company Contacts
+                                <div class="mb-4 border rounded" >
+                                    <div class="bg-white font-weight-bold rounded px-3 py-2 mb-3 d-flex justify-content-between align-items-center">
+                                         <div ><i class="far fa-building ms-1 h3"></i>&nbsp;Company Contacts</div> 
+                                          <!--<i class="fas fa-user-plus add_contact btnAddContact" style="cursor:pointer;"  data-id="${company.id}"></i> -->
+                                        <button class="btn btn-outline-secondary add_contact btnAddContact"  data-id="${company.id}">Add</button>
                                     </div>
                                     <div class="scrollable_div" style="height: 300px; overflow-y: auto;">
                                     ${contactHtml}
@@ -608,25 +629,39 @@ if (company.latest_updates && company.latest_updates.length > 0) {
                                 </div>
 
                                 <!-- AGENT DETAILS -->
-                                <div class="mb-4">
-                                    <div class="bg-success text-white rounded px-3 py-2 mb-3">
+                                <div class="mb-4 border border-success" >
+                                    <div class=" rounded px-3 py-2 d-flex justify-content-between align-items-center">
                                         Agent Details
-                                    </div>
+                                          <!-- <i class="fas fa-edit btnUpdateStatus"  style="cursor:pointer;" data-id="${company.id}" data-cname="${company.company_name ?? ''}"></i>-->
+                                    <button
+                                    type="button"
+                                    class="btnUpdateStatus btn btn-sm btn btn-outline-success"
+                                   data-id="${company.id}" data-cname="${company.company_name ?? ''}">
+                                    ✏️ Update Status
+                                </button>
+                                    
+                                          </div>
 
                                     ${agentHtml}
-                                </div>
+                                
 
                                 <!-- LATEST UPDATE -->
-                                <div class="mb-4">
-                                    <div class="bg-warning text-dark rounded px-3 py-2 mb-3">
-                                        Latest Agent Update
-                                    </div>
+                                <div class="mb-4 p-4 ">
 
-                                    ${latestUpdateHtml}
+                                    <div class="MainlatestUpdate ">
+                                        <div class=" text-dark rounded px-3 py-2 mb-3 latestUpdateHeader">
+                                            Latest Agent Update
+                                        </div>
+                                        <div class="latestUpdateBody">
+                                        ${latestUpdateHtml}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- ACTION BUTTONS -->
-                                <div class="d-flex gap-2">
+                              <!--- <div class="d-flex gap-2">
+
+                              
                                     <button class="btn btn-sm btn-secondary w-50 btnUpdateStatus"
                                             data-id="${company.id}"
                                             data-cname="${company.company_name ?? ''}">
@@ -637,7 +672,10 @@ if (company.latest_updates && company.latest_updates.length > 0) {
                                             data-id="${company.id}">
                                         Add Contact
                                     </button>
-                                </div>
+                                </div> -->
+
+                                </div> 
+                                  <!-- ENDING OF AGENT DETAILS DIV --> 
 
                             </div>
                         </div>
@@ -926,6 +964,83 @@ $('#SaveContactUpdates').click(function(){
 </script>
 
 <style>
+/* for LatestUpdate */
+/* CSS Styling */
+.MainlatestUpdate {
+  border: 1px solid #e0dbcd; /* Manipis na border sa gilid */
+  border-radius: 6px;        /* Swabeng kurba sa mga kanto */
+  overflow: hidden;          /* Para hindi lumampas ang kulay sa kurba */
+  font-family: sans-serif;
+  max-width: 500px;    
+      /* Pwede mong baguhin ang laki nito */
+}
+
+.latestUpdateHeader {
+  background-color: #fef1cf; /* Eksaktong kulay-cream/dilaw sa header */
+  color: #2b2516;            /* Madilim na kulay para sa text */
+  font-size: 12px;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-bottom: 1px solid #e0dbcd; /* Linya sa ilalim ng header */
+}
+
+.latestUpdateBody {
+  background-color: #ffffff; /* Puti ang loob */
+  color: #000000;
+  padding: 20px;
+  text-align: left; 
+  
+}
+
+
+
+#CapitaLized{text-transform: capitalize; font-weight: bold;}
+    
+/* For Card Design View */
+.company-header-card {
+    /* Ang iyong orihinal na blue-purple gradient base */
+    background: linear-gradient(90deg, #10063c 0%, #1e1f71 50%, #3a3b97 100%);
+    
+    /* Banayad na box shadow para magmukhang lumulutang ang header */
+    box-shadow: 0 4px 15px rgba(102, 16, 242, 0.15);
+    
+    /* Siguraduhing pantay ang transition kapag may hover effects */
+    transition: all 0.3s ease;
+}
+
+/* Hover effect para sa Edit Icon sa loob ng address */
+.company-header-card .fa-edit {
+    transition: color 0.2s ease-in-out, transform 0.2s ease;
+}
+
+.company-header-card .fa-edit:hover {
+    color: #ffffff !important; /* Nagiging purong puti kapag itinapat ang mouse */
+    transform: scale(1.15); /* Lalaki nang kaunti para madaling mapansin */
+}
+
+
+
+
+.add_contact, .btnUpdateStatus {
+  transition: all 0.2s ease-in-out; /* Para smooth ang pagbago */
+}
+
+/* Effect kapag itinapat ang mouse (Hover) */
+.add_contact:hover {
+  color: #ffc107; /* Papalitan ang kulay (hal. Yellow/Gold) */
+  transform: scale(1.2); /* Lalaki ng kaunti ang icon */
+  opacity: 0.8; /* Magiging medyo transparent */
+}
+
+.btnUpdateStatus:hover {
+  color: #ffc107; /* Papalitan ang kulay (hal. Yellow/Gold) */
+  transform: scale(1.2); /* Lalaki ng kaunti ang icon */
+  opacity: 0.8; /* Magiging medyo transparent */
+}
+
+
+
+
     .card:hover{
     transform: translateY(-3px);
     transition: .2s ease;

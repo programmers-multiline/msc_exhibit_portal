@@ -20,9 +20,14 @@ class UserLoginController extends Controller
     {
         $credentials = $request->only('username', 'password');
        
+       // dd($credentials);
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
+           // $user = Auth::user();
+
+           // dd($user);
  
             return redirect('/company_card');
         }
@@ -56,6 +61,8 @@ class UserLoginController extends Controller
         // return response()->json(['message' => 'User not found'], 401);
 
         $user = User::find($request->user_id);
+
+       // dd($user);
 
         if (!$user) {
             abort(403);

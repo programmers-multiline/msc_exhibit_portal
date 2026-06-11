@@ -5,9 +5,18 @@
 <div class="card-box mb-30 p-3 ml-15">
 
     <h4 class="mb-3">Participants</h4>
-    <button class="btn btn-sm btn-primary mb-2" data-toggle="modal" data-target="#addParticipantModal">Add Participant</button>
+   <!--  <button class="btn btn-sm btn-primary mb-2" data-toggle="modal" data-target="#addParticipantModal">Add Participant</button> -->
+   
+@if(auth()->user()->position_id == 13)
+    
     <button class="btn btn-sm btn-success mb-2" id="bulkAssignBtn">Assign PSC</button>
-    <button class="btn btn-sm btn-success mb-2" data-toggle="modal" data-target="#importModal">Import Excel</button>
+@else
+    
+     <button class="btn btn-sm btn-secondary mb-2" style="cursor:not-allowed;" disabled>Assign PSC</button>
+@endif
+
+   <!--  <button class="btn btn-sm btn-success mb-2" data-toggle="modal" data-target="#importModal">Import Excel</button> -->
+
 <table id="ParticipantTbl" class="table table-bordered table-responsive nowrap w-100">
     <thead>
         <tr>
@@ -467,34 +476,7 @@ $('#bulkAssignBtn').click(function(){
 });
 //
 //Use to Save Assigned PSC
-$('#confirmAssign').click(function(){
 
-    let selected = [];
-
-    $('.participant_checkbox:checked').each(function(){
-        selected.push($(this).val());
-    });
-
-    let psc_id = $('#psc_id').val();
-
-    $.ajax({
-        url: '/participants/bulk-assign',
-        type: 'POST',
-        data:{
-            _token: "{{ csrf_token() }}",
-            participants: selected,
-            psc_id: psc_id
-        },
-        success:function(){
-
-            $('#assignModal').modal('hide');
-
-            $('#ParticipantTbl').DataTable().ajax.reload(null,false);
-
-        }
-    });
-
-});
 
 
 //Use to update status of attendees
@@ -913,7 +895,7 @@ $('#confirmAssign').click(function(){
 
     let psc_id = $('#psc_id').val();
 
-    alert(psc_id)
+    //alert(psc_id)
 
     if(selected.length === 0){
         alert("Please select participants");
