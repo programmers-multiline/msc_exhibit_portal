@@ -7,7 +7,14 @@
     <h4 class="mb-3">Participants</h4>
    <!--  <button class="btn btn-sm btn-primary mb-2" data-toggle="modal" data-target="#addParticipantModal">Add Participant</button> -->
    
-@if(auth()->user()->position_id == 13)
+
+
+   <!--  <button class="btn btn-sm btn-success mb-2" data-toggle="modal" data-target="#importModal">Import Excel</button> -->
+
+
+   <div class="row p-2">
+        <div class="buttonDiv w-25">
+        @if(auth()->user()->position_id == 13)
     
     <button class="btn btn-sm btn-success mb-2" id="bulkAssignBtn">Assign PSC</button>
 @else
@@ -15,7 +22,38 @@
      <button class="btn btn-sm btn-secondary mb-2" style="cursor:not-allowed;" disabled>Assign PSC</button>
 @endif
 
-   <!--  <button class="btn btn-sm btn-success mb-2" data-toggle="modal" data-target="#importModal">Import Excel</button> -->
+        </div>
+        <div class="searchingDiv w-50">
+                <form>
+                <label for="start">Start Date:</label>
+                <input type="date" id="start" name="startDate">
+
+                <label for="end">End Date:</label>
+                <input type="date" id="end" name="endDate">
+                <button class="btn btn-outline-secondary mb-2">Filter</button>
+                </form>
+
+                <script>
+                const startDateInput = document.getElementById('start');
+                const endDateInput = document.getElementById('end');
+
+                // When start date changes, end date cannot be earlier than start date
+                startDateInput.addEventListener('change', function() {
+                    if (this.value) {
+                    endDateInput.min = this.value;
+                    }
+                });
+
+                // When end date changes, start date cannot be later than end date
+                endDateInput.addEventListener('change', function() {
+                    if (this.value) {
+                    startDateInput.max = this.value;
+                    }
+                });
+                </script>
+            </div>
+            <!-- Ending of SearchingDiv -->
+   </div>
 
 <table id="ParticipantTbl" class="table table-bordered table-responsive nowrap w-100">
     <thead>
@@ -558,35 +596,7 @@ $(document).on('click','.viewImages', function(){
 
 
 $(document).ready(function(){
-
-    $('#ParticipantTbl').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "/participants",
-
-        columns: [
-            { data: 'checkbox', name: 'checkbox', orderable:false, searchable:false },
-            { data: 'exhibit_name', name: 'exhibit_name' },
-            { data: 'participant_photo', name: 'participant_photo' },
-            {
-                data: 'name_position',
-                name: 'name_position',
-                render: function(data){
-                    return data;
-                }
-            },
-            { data: 'participant_email', name: 'participant_email' },
-            { data: 'company_name', name: 'company_name' },
-            { data: 'participant_contact', name: 'participant_contact' },
-            { data: 'participant_address', name: 'participant_address' },
-            { data: 'day_num', name: 'day_num' },
-            { data: 'participant_remarks', name: 'participant_remarks' },
-            { data: 'entry_by_name', name: 'entry_by_name' },
-      
-        ]
-    });
-
-
+    ParticipantData();
 
  $('#saveParticipant').click(function(){
 
@@ -883,6 +893,37 @@ $('#participant_name').on('keyup', function() {
 
 
 });//Ending of Document Ready
+
+function ParticipantData(){
+        $('#ParticipantTbl').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "/participants",
+
+        columns: [
+            { data: 'checkbox', name: 'checkbox', orderable:false, searchable:false },
+            { data: 'exhibit_name', name: 'exhibit_name' },
+            { data: 'participant_photo', name: 'participant_photo' },
+            {
+                data: 'name_position',
+                name: 'name_position',
+                render: function(data){
+                    return data;
+                }
+            },
+            { data: 'participant_email', name: 'participant_email' },
+            { data: 'company_name', name: 'company_name' },
+            { data: 'participant_contact', name: 'participant_contact' },
+            { data: 'participant_address', name: 'participant_address' },
+            { data: 'day_num', name: 'day_num' },
+            { data: 'participant_remarks', name: 'participant_remarks' },
+            { data: 'entry_by_name', name: 'entry_by_name' },
+      
+        ]
+    });
+}
+
+
 
 $('#confirmAssign').click(function(){
 
