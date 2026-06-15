@@ -14,7 +14,7 @@
 
    <div class="row p-2">
         <div class="buttonDiv w-25">
-        @if(auth()->user()->position_id == 13)
+        @if (in_array(auth()->user()->position_id, [13, 237]))
     
     <button class="btn btn-sm btn-success mb-2" id="bulkAssignBtn">Assign PSC</button>
 @else
@@ -596,7 +596,35 @@ $(document).on('click','.viewImages', function(){
 
 
 $(document).ready(function(){
-    ParticipantData();
+
+    $('#ParticipantTbl').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "/participants",
+
+        columns: [
+            { data: 'checkbox', name: 'checkbox', orderable:false, searchable:false },
+            { data: 'exhibit_name', name: 'exhibit_name' },
+            { data: 'participant_photo', name: 'participant_photo' },
+            {
+                data: 'name_position',
+                name: 'name_position',
+                render: function(data){
+                    return data;
+                }
+            },
+            { data: 'participant_email', name: 'participant_email' },
+            { data: 'company_name', name: 'company_name' },
+            { data: 'participant_contact', name: 'participant_contact' },
+            { data: 'participant_address', name: 'participant_address' },
+            { data: 'day_num', name: 'day_num' },
+            { data: 'participant_remarks', name: 'participant_remarks' },
+            { data: 'entry_by', name: 'entry_by' },
+      
+        ]
+    });
+
+
 
  $('#saveParticipant').click(function(){
 
@@ -893,37 +921,6 @@ $('#participant_name').on('keyup', function() {
 
 
 });//Ending of Document Ready
-
-function ParticipantData(){
-        $('#ParticipantTbl').DataTable({
-        processing: true,
-        serverSide: true,
-        ajax: "/participants",
-
-        columns: [
-            { data: 'checkbox', name: 'checkbox', orderable:false, searchable:false },
-            { data: 'exhibit_name', name: 'exhibit_name' },
-            { data: 'participant_photo', name: 'participant_photo' },
-            {
-                data: 'name_position',
-                name: 'name_position',
-                render: function(data){
-                    return data;
-                }
-            },
-            { data: 'participant_email', name: 'participant_email' },
-            { data: 'company_name', name: 'company_name' },
-            { data: 'participant_contact', name: 'participant_contact' },
-            { data: 'participant_address', name: 'participant_address' },
-            { data: 'day_num', name: 'day_num' },
-            { data: 'participant_remarks', name: 'participant_remarks' },
-            { data: 'entry_by_name', name: 'entry_by_name' },
-      
-        ]
-    });
-}
-
-
 
 $('#confirmAssign').click(function(){
 

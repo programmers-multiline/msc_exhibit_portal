@@ -10,6 +10,7 @@ class Participants extends Model
     use HasFactory;
 
     protected $fillable = [
+    'id',
     'company_id',
     'exhibit_name',
     'entry_by',

@@ -227,7 +227,11 @@ foreach ($grouped as $companyId => $contacts) {
     
 //,'p.address_name as city_province'
 //Ito naka Left join
-$companies = \App\Models\Company::select('company_list.id','company_list.company_name','company_list.address','p.address_name as city_province')
+$companies = \App\Models\Company::select(
+    'company_list.id',
+    'company_list.company_name',
+    'company_list.address',
+    'p.address_name as city_province')
     ->join('assigned_agent as a', 'a.company_id', '=', 'company_list.id')
     ->join('users as b', 'b.emp_id', '=', 'a.psc_emp_id')
    ->leftJoin('ph_address as p', 'p.cor_code', '=', 'company_list.city_province_code')

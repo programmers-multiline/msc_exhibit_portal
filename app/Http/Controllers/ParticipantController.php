@@ -134,7 +134,7 @@ class ParticipantController extends Controller
     )
             ->leftJoin('company_list', 'participants.company_id', '=', 'company_list.id')
             ->leftJoin('users', 'participants.entry_by', '=', 'users.emp_id')
-            ->leftJoin('assigned_agent','participants.assigned_psc','=','assigned_agent.psc_emp_id')
+            ->leftJoin('assigned_agent','participants.id','=','assigned_agent.company_id')
             ->with('images')
             ->orderBy('participants.id', 'desc');
 
@@ -145,17 +145,17 @@ class ParticipantController extends Controller
         ->addColumn('checkbox', function($row){
 
                 // 1. Check kung may assigned PSC
-                if (!empty($row->assigned_psc)) {
+                if (!empty($row->psc_name)) {
                     return '<span class="badge bg-success text-white">
                                 PSC: '.$row->psc_name.'
                             </span>';
                 }
 
                 // 2. Check kung ang position_id ng naka-login na user ay 13
-                else if (auth()->user()->position_id == 13) {
+                else if (in_array(auth()->user()->position_id, [13, 237])) {
                     return '<input type="checkbox"
                             class="participant_checkbox"
-                            value="'.$row->id.'">';
+                            value="'.$row->company_id.'">';
                 }
 
                 // 3. Default kapag hindi pumasa sa mga condition sa itaas
