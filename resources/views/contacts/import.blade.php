@@ -43,7 +43,7 @@
 								<input type="file" name="file" id="file" class="form-control" required>
 								<div id="errorArea" class="text-danger mt-2 small"></div>
 							</div>
-							<button type="submit" id="submitBtn" class="btn btn-success w-100">Simulan ang Pag-import</button>
+							<button type="submit" id="submitBtn" class="btn btn-success w-25">Import</button>
 						</form>
 
 						<!-- 2. LOADING STATE (Habang nag-uupload at nagpa-parse) -->
@@ -78,7 +78,7 @@
 
 							<p id="successMessage" class="text-muted small text-center mb-4">Matagumpay na na-insert ang mga data sa kani-kanilang table.</p>
 							<div class="text-center">
-								<button onclick="window.location.reload()" class="btn btn-outline-primary btn-sm">Mag-upload ng Bago</button>
+								<button onclick="window.location.reload()" class="btn btn-outline-primary btn-sm ">Mag-upload ng Bago</button>
 							</div>
 						</div>
 						<!-- Ending ng Success State -->
