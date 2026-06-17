@@ -7,5 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ExhibitName extends Model
 {
-    use HasFactory;
+     use HasFactory;
+    protected $table = 'exhibit_names';
+    protected $fillable = ['exhibit_name', 'exhibit_status'];
 }

@@ -12,6 +12,7 @@ use App\Mail\ParticipantBrochureMail;
 use App\Http\Controllers\BrochureController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\CustomerList;
+use App\Http\Controllers\ContactImportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -150,3 +151,7 @@ Route::get('/ai-test', function () {
 
     return $response['choices'][0]['message']['content'];
 });
+
+
+Route::get('/import', [ContactImportController::class, 'showForm'])->name('import.form');
+Route::post('/import', [ContactImportController::class, 'import'])->name('import.process');

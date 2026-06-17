@@ -71,6 +71,7 @@ class UserLoginController extends Controller
         Auth::login($user);
 
         $request->session()->regenerate();
+   
 
         return redirect()->route('participants.create');
     }

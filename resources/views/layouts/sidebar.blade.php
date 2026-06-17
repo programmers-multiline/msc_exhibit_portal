@@ -35,6 +35,12 @@
 							<span class="mtext">Client List</span>
 						</a>
 					</li>
+					<li class="{{ request()->is('import') || request()->is('import/*') ? 'active' : '' }}">
+						<a href="{{ url('import') }}" class="dropdown-toggle no-arrow">
+							<span class="micon dw dw-invoice"></span>
+							<span class="mtext">import</span>
+						</a>
+					</li>
 				
 					<li>
 						<div class="dropdown-divider"></div>
