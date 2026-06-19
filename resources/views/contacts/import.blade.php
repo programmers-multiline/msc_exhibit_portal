@@ -71,7 +71,7 @@
 									<strong id="totalNew" class="text-success">0</strong>
 								</div>
 								<div class="d-flex justify-content-between py-2">
-									<span class="text-warning fw-semibold">🟡 Total Duplicate (Skipped):</span>
+									<span class="text-warning fw-semibold">🟡 Total Existing Contact :</span>
 									<strong id="totalDuplicate" class="text-warning">0</strong>
 								</div>
 							</div>

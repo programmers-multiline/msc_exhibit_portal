@@ -13,6 +13,7 @@ use App\Http\Controllers\BrochureController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\CustomerList;
 use App\Http\Controllers\ContactImportController;
+use App\Http\Controllers\AssignedController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,6 +25,10 @@ use App\Http\Controllers\ContactImportController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+
+
+
 
 Route::get('/participants', [ParticipantController::class, 'index'])->name('participants.index');
 Route::get('/participants/create', [ParticipantController::class, 'create'])->name('participants.create');
@@ -153,5 +158,22 @@ Route::get('/ai-test', function () {
 });
 
 
+
+
+
 Route::get('/import', [ContactImportController::class, 'showForm'])->name('import.form');
 Route::post('/import', [ContactImportController::class, 'import'])->name('import.process');
+
+Route::get('/Attendance', [ContactImportController::class, 'ViewAttendance'])->name('Attendance.index');
+Route::post('/Attendance/bulk-assign',[ContactImportController::class, 'bulkAssign']);
+
+Route::get('/AssignedContact', [AssignedController::class, 'index'])->middleware('auth');
+
+Route::get('/viewcontacts', [ContactImportController::class, 'ViewContacts'])->name('contacts.viewcontacts')->middleware('auth');
+
+
+
+
+
+Route::post('/AssignedContact/update-status/{id}', [ContactImportController::class, 'ContactUpdateStatus'])
+     ->name('assigned.updateStatus');

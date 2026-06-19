@@ -23,6 +23,7 @@
 							<span class="micon dw dw-library"></span><span class="mtext">Leads</span>
 						</a>
 						<ul class="submenu">
+							<li class="{{ request()->is('AssignedContact') ? 'active' : '' }}"><a href="/AssignedContact">Assigned Contact</a></li>
 							<li class="{{ request()->is('company_card') ? 'active' : '' }}"><a href="/company_card">Per Company</a></li>
 							<li class="{{ request()->is('contacts') ? 'active' : '' }}"><a href="/contacts">Per Contacts</a></li>
 							<li class="{{ request()->is('participants') ? 'active' : '' }}"><a href="/participants">Partcipants</a></li>
@@ -39,6 +40,20 @@
 						<a href="{{ url('import') }}" class="dropdown-toggle no-arrow">
 							<span class="micon dw dw-invoice"></span>
 							<span class="mtext">import</span>
+						</a>
+					</li>
+
+					<li class="{{ request()->is('Attendance') || request()->is('Attendance/*') ? 'active' : '' }}">
+						<a href="{{ url('Attendance') }}" class="dropdown-toggle no-arrow">
+							<span class="micon dw dw-invoice"></span>
+							<span class="mtext">Attendance</span>
+						</a>
+					</li>
+
+					<li class="{{ request()->is('viewcontacts') || request()->is('viewcontacts/*') ? 'active' : '' }}">
+						<a href="{{ url('viewcontacts') }}" class="dropdown-toggle no-arrow">
+							<span class="micon dw dw-invoice"></span>
+							<span class="mtext">Contacts</span>
 						</a>
 					</li>
 				

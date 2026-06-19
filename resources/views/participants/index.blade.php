@@ -393,12 +393,6 @@
 </div>
 
 <div class="modal-body">
-
-<!-- <select id="psc_id" class="form-control">
-<option value="">Select PSC</option>
-<option value="1">PSC 1</option>
-<option value="2">PSC 2</option>
-</select> -->
 <select id="psc_id" class="form-control">
  @foreach($users as $user)
     @php

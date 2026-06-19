@@ -1,0 +1,913 @@
+@extends('layouts.app')
+
+@section('content')
+
+<div class="container-fluid mt-4">
+
+    <h3 class="mb-3">My Leads</h3>
+ <!--    <a href="/companies">Table</a> OR <a href="/company_card">Card Format</a>
+    <button id="viewAllCompany" class="btn btn-sm mb-2 btn-secondary">View All Company</button>
+    <button class="btn btn-sm btn-success mb-2" id="bulkAssignBtn">Assign Agent</button>
+
+    <input type="text"
+           id="companySearch"
+           class="form-control mb-4"
+           placeholder="Search Company or Contact Person..."> -->
+
+    <div id="summary" class="mb-3 text-muted"></div>
+
+    <!-- Start of Card -->
+<!-- 1. PARENT WRAPPER: Flex container na nag-aalaga sa pantay na agwat at pagbaba ng hilera -->
+<div class="d-flex flex-wrap justify-content-start align-items-stretch p-4" style="gap: 25px;">
+    
+    @foreach($companies as $companyData)
+        <!-- 2. MAIN CARD: Tinanggal ang panggulong 'col' classes para hindi mag-clash ang width -->
+        <div class="main-container bg-white shadow-sm p-2 border rounded d-flex flex-column" style="width: 330px; height: auto; font-size: 0.75rem !important; flex-shrink: 0;">
+
+            <!-- 1. HEADER SECTION (Fixed Height) -->
+            <div class="company-header-card header-bg p-3 rounded-top d-flex justify-content-between align-items-center mb-2" style="height: 60px;">
+                <div class="text-truncate" style="max-width: 85%;">
+                    <h6 class="fw-bold m-0 text-uppercase tracking-wide text-truncate" style="color:whitesmoke;font-size: 0.90rem;" title="{{ $companyData['company_name'] }}">
+                        {{ $companyData['company_name'] }}
+                    </h6>
+                    <small class="text-muted-custom text-truncate d-block">
+                        {{ $companyData['address'] }} <i class="far fa-edit ms-1" style="font-size: 0.7rem;"></i>
+                    </small>
+                </div>
+                <i class="fas fa-building fs-4 text-muted-custom flex-shrink-0"></i>
+            </div>
+
+            <!-- 2. LEAD PIPELINE SECTION (Fixed Height) -->
+            <div class="border p-2 rounded mb-2" style="height: 70px;">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="fw-semibold">Lead Pipeline</span> 
+                    <span class="text-muted" style="font-size: 0.7rem;">[ {{ $companyData['status_percentage'] }} ]</span>
+                </div>
+                <div class="progress mb-2" style="height: 6px;">
+                    <div class="progress-bar progress-bar-custom" role="progressbar" style="width: {{ $companyData['status_percentage'] }};"></div>
+                </div>
+                <div class="form-check m-0">
+                    <input class="form-check-input border-danger" type="checkbox" id="checkAssign_{{ $loop->index }}">
+                    <label class="form-check-label text-danger fw-medium" for="checkAssign_{{ $loop->index }}">
+                        Check to Assign Agent
+                    </label>
+                </div>
+            </div>
+
+            <!-- 3. COMPANY CONTACTS SECTION WITH STRICT SCROLL HEIGHT -->
+            <div class="border p-2 rounded mb-2 d-flex flex-column" style="height: 220px;">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold"><i class="fas fa-building me-1"></i> Company Contacts</span>
+                    <button class="btn btn-outline-secondary btn-sm px-3">Add</button>
+                </div>
+
+                <!-- FIXED HEIGHT SCROLL BOX -->
+                <div class="contact-scroll-box bg-light flex-grow-1" style="height: 170px; overflow-y: auto;">
+                    @if(count($companyData['contacts']) > 0)
+                        @foreach($companyData['contacts'] as $index => $contact)
+                            <div class="bg-white p-2 rounded border mb-2 position-relative shadow-sm">
+                                <span class="text-muted d-block mb-1" style="font-size: 0.65rem;">Contact Person {{ $index + 1 }}</span>
+                                <span class="font-weight-bold d-block fst-italic mb-1 text-truncate" style="font-size: 0.8rem;">{{ $contact['name'] }}</span>
+                                
+                                <div class="text-secondary lh-sm text-truncate" style="font-size: 0.7rem;">
+                                    <div class="mb-1 text-truncate"><i class="fas fa-phone-alt text-danger me-1"></i> {{ $contact['phone'] }}</div>
+                                    <div class="mb-1 text-truncate"><i class="fas fa-envelope text-danger me-1"></i> {{ $contact['email'] }}</div>
+                                </div>
+                                
+                                <div class="text-end mt-1 text-right">
+                                    <button class="btn btn-outline-dark btn-sm" id="UpdateContact" data-id="{{ $contact['id'] }}" data-contact="{{ $contact['phone'] }}" data-email="{{ $contact['email'] }}" data-name="{{ $contact['name'] }}">
+                                        <i class="fas fa-pencil-alt me-1"></i>Edit
+                                    </button>
+                                </div>
+                            </div>
+                        @endforeach
+                    @else
+                        <div class="text-center text-muted py-4 my-auto">No Contact Persons</div>
+                    @endif
+                </div>
+            </div>
+
+            <!-- 4. AGENT DETAILS SECTION (Fixed Height sa Pinakababang Bahagi) -->
+            <div class="agent-section bg-white mt-auto border border-success  rounded" style="height: auto;">
+                <div class="d-flex justify-content-between align-items-center border rounded p-2" style="background-color:#fef1cf;">
+                    <span class="font-weight-bold">Agent Details</span>
+                   
+                    <button class            = "btn btn-outline-success btn-sm btnUpdateStatus" id = "UpdateStatus"
+                            data-id          = "{{ $companyData['company_id'] }}"
+                            data-cname       = "{{ $companyData['company_name'] }}"
+                            data-lead_status = "{{ $companyData['ContactUpdate'] }}"
+                    ><i     class            = "fas fa-pencil-alt me-1"></i> &nbsp;Update Status</button>
+
+                </div>
+
+                <div class="d-flex align-items-center mb-2 border  border-secondary p-2">
+                    <div class=" bg-secondary rounded-circle d-flex align-items-center justify-content-center text-white me-2 shadow-sm flex-shrink-0" style="width: 30px; height: 28px;">
+                        <i class="fas fa-user style-sm"></i>
+                    </div>
+                    <div class=" text-truncate">
+                        <span class="font-weight-bold d-block m-0 text-uppercase text-truncate" style="font-size: 0.75rem;">
+                           &nbsp; {{ $companyData['AgentName'] }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Fixed Height Update Inner Box -->
+                <div class="update-box p-1 " style="height: 110px;">
+                    <div class="bg-white p-2 rounded border shadow-sm h-100" style="overflow: hidden;">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge bg-success text-white py-0.5 px-1.5" style="font-size: 0.6rem;">
+                                {{ $companyData['lead_status'] }}
+                            </span>
+                            <small class="text-muted" style="font-size: 0.6rem;">
+                                @if($companyData['UpdateTime'] && $companyData['UpdateTime'] !== '--')
+                                    {{ \Carbon\Carbon::parse($companyData['UpdateTime'])->format('M d, Y h:i A') }}
+                                @else
+                                    No Update Yet
+                                @endif
+                            </small>
+                        </div>
+                        <p class="m-0 text-dark fst-italic lh-sm text-wrap" style="font-size: 0.7rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            {{ $companyData['UpdateRemarks'] }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- WAKAS NG MAIN CONTAINER -->
+    @endforeach
+
+</div> <!-- WAKAS NG PARENT WRAPPER -->
+
+
+
+
+
+<!-- Ending of Card -->
+
+</div>
+<!-- Ending of container mt-4 -->
+
+ 
+
+
+
+
+<!-- For Carousel Modal -->
+<div class="modal fade" id="imageCarouselModal">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-body">
+
+                <div id="participantCarousel" class="carousel slide" data-ride="carousel">
+
+                    <div class="carousel-inner" id="carouselImages">
+                        <!-- Images will be inserted here via JS -->
+                    </div>
+
+                    <a class="carousel-control-prev" href="#participantCarousel" data-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </a>
+
+                    <a class="carousel-control-next" href="#participantCarousel" data-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Ending of Carousel Modal -->
+
+<!-- MOdal for Assigning of PSC -->
+ <div class="modal fade" id="assignModal">
+<div class="modal-dialog">
+<div class="modal-content">
+
+<div class="modal-header">
+<h5>Assign PSC</h5>
+</div>
+
+<div class="modal-body">
+
+</div>
+
+<div class="modal-footer">
+<button class="btn btn-primary" id="confirmAssign">
+Save Assignment
+</button>
+</div>
+
+</div>
+</div>
+</div>
+ <!-- Ending of Modal Assigning of PSC -->
+
+
+ <!-- Modal to update the Status of Attendees -->
+ <div class="modal fade" id="statusModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title">You are Updating the status of</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="company_id">
+         <p id="CompanyName" class="bg bg-success text-white p-2"></p>   
+        <div class="mb-3">
+            <label>Select Activity</label>
+            <select class="form-control" id="lead_status">
+                     <option value="">-- Select Category --</option>
+                    @foreach($lead_agent_status as $lead_status)
+                        <option value="{{ $lead_status->id }}" data-description="{{ $lead_status->description }}">
+                            {{ $lead_status->lead_status }}
+                        </option>
+                    @endforeach
+            </select>
+        </div>
+
+        <div class="mb-3" id="signedProposalFileWrapper" style="display:none;">
+            <label>Upload Signed Proposal</label>
+            <input type="file" class="form-control" id="signed_proposal_file">
+        </div>
+
+        <div class="mb-3" id="customerCodeWrapper" style="display:none;">
+            <label>Customer Code</label>
+            <input type="text" class="form-control" id="customer_code">
+        </div>
+
+
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea class="form-control" id="description"></textarea>
+        </div>
+
+        
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" id="saveStatus">
+            Save2
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Ending of Modal Update Status Attendees -->
+
+
+ <!-- Modal to update Address Modal -->
+ <div class="modal fade" id="AddressModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title">Updating Address Form</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="company_id">
+         <p id="company_name" class="bg bg-success text-white p-2"></p>   
+    
+
+        <div class="mb-3">
+            <label>Input Addres</label>
+            <textarea class="form-control" id="Address"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" id="saveAddress">
+            Save
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- Ending of Modal Update Address Modal -->
+
+
+<!-- Modal to update Contact Person Details Modal -->
+ <div class="modal fade" id="ContactPersonUpdateModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title">Update Contact Details Form</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="p_id">
+         <p id="contact_company_name" class="bg bg-success text-white p-2"></p>   
+    
+
+        <div class="mb-3">
+            <label>Fullname</label>
+            <input type="text" class="form-control" id="participant_name">
+        </div>
+
+        <div class="mb-3">
+            <label>Email</label>
+            <input type="text" class="form-control" id="participant_email">
+        </div>
+
+        <div class="mb-3">
+            <label>Contact#</label>
+            <input type="text" class="form-control" id="participant_contact">
+        </div>
+
+        
+
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" id="SaveContactUpdates">
+            Save
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- Ending update Contact Person Details Modal -->
+
+
+<!-- Modal to update the Status of Attendees -->
+<!--  <div class="modal fade" id="statusModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title">Update Status</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="participant_id">
+        
+        <div class="mb-3">
+            <label>Select Activity1</label>
+            <select class="form-control" id="status">
+                <option value="">Select</option>
+                <option value="Phone Call">1st Phone Call</option>
+                <option value="Product Presentation">Product Presentation</option>
+                <option value="RFQ Creation">RFQ Creation</option>
+                <option value="Submitted Proposal">Submitted Proposal</option>
+                <option value="For Revision of Proposal">For Revision of Proposal</option>
+                <option value="Received Signed Proposal">Received Signed Proposal</option>
+                <option value="Received Signed Contract">Received Signed Contract</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea class="form-control" id="description"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" id="saveStatus">
+            Save
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div> -->
+
+<!-- Ending of Modal Update Status Attendees -->
+<style>
+.participant_checkbox{
+    appearance: none;
+    -webkit-appearance: none;
+    width:18px;
+    height:18px;
+    border:2px solid red;
+    border-radius:3px;
+    background-color:white;
+    cursor:pointer;
+}
+.participant_checkbox:checked{
+    background-color:red;
+}
+.img-thumbnail{
+    object-fit: cover;
+}
+</style>
+
+<script>
+
+//Use to update status of attendees
+$('#saveStatus').click(function(){
+
+    var id            = $('#company_id').val();
+    var lead_status   = $('#lead_status').val();
+    var description   = $('#description').val();
+    var files         = $('#signed_proposal_file')[0].files;
+    var customer_code = $('#customer_code').val();
+
+    // Required only if status = 9
+    if (lead_status == 9 && files.length === 0) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'File Required',
+            text: 'Please upload the signed proposal file.'
+        });
+        return;
+    }
+
+     if (lead_status == 10 && !customer_code) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Customer Code Required',
+                text: 'Please input the customer code'
+            });
+            return;
+        }
+
+    let formData = new FormData();
+    formData.append('_token', '{{ csrf_token() }}');
+    formData.append('status', lead_status);
+    formData.append('description', description);
+    formData.append('customer_code', customer_code);
+
+    // Attach files only if exists
+    for (let i = 0; i < files.length; i++) {
+        formData.append('files[]', files[i]);
+    }
+
+    $.ajax({
+    
+        url: "/AssignedContact/update-status/" + id,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response){
+
+            $('#company_id').val('');
+            $('#lead_status').val('').trigger('change');
+            $('#description').val('');
+            $('#customer_code').val('');
+            $('#signed_proposal_file').val('');
+            $('#signedProposalFileWrapper').hide();
+            $('#customerCodeWrapper').hide();
+
+
+            $('#statusModal').modal('hide');
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Saved!',
+                text: 'Successfully Updated the lead status.',
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-center'
+            });
+
+            loadCompanies();
+        }
+    });
+
+});
+
+//Use to open the modal of Updating status
+    $(document).on('click', '#UpdateStatus', function(){
+//alert('Test');
+ var id          = $(this).data('id');
+ var cname       = $(this).data('cname');
+ var lead_status = $(this).data('lead_status');
+
+console.log(id)
+    $('#CompanyName').text(cname);
+    $('#company_id').val(id);
+    $('#lead_status').val(lead_status);
+
+    
+    $('#statusModal').modal('show');
+    });
+
+//Use to open the Modal Updating Contact Person Form
+//By Clicking the Edit BUtton per Contact
+$(document).on('click', '#UpdateContact', function(){
+
+    var p_id        = $(this).data('id');
+    var companyname = $(this).data('companyname');
+    var name        = $(this).data('name');
+    var email       = $(this).data('email');
+    var contact     = $(this).data('contact');
+
+    console.log(companyname);
+    //alert(company_name)
+
+    $('#contact_company_name').text(companyname);
+    $('#p_id').val(p_id);
+    $('#participant_name').val(name);
+    $('#participant_email').val(email);
+    $('#participant_contact').val(contact);
+
+    
+    $('#ContactPersonUpdateModal').modal('show');
+});
+
+
+
+
+
+
+$('#lead_status').on('change', function () {
+    let selected_lead_status = $(this).val();
+console.log(selected_lead_status);
+    if (selected_lead_status == 9) {
+        $('#signedProposalFileWrapper').show();
+        $('#signed_proposal_file').prop('required', true);
+    } 
+    else {
+        $('#signedProposalFileWrapper').hide();
+        $('#signed_proposal_file').prop('required', false);
+        $('#signed_proposal_file').val('');
+    }
+
+    if (selected_lead_status == 10) {
+        $('#customerCodeWrapper').show();
+        $('#customer_code').prop('required', true);
+    } 
+    else {
+        $('#customerCodeWrapper').hide();
+        $('#customer_code').prop('required', false);
+        $('#customer_code').val('');
+    }
+
+    
+});
+
+
+
+//Ginamit ko ito para ma auto fill yung text area
+document.getElementById('lead_status').addEventListener('change', function() {
+    let selectedOption = this.options[this.selectedIndex];
+    let description = selectedOption.getAttribute('data-description');
+
+    document.getElementById('description').value = description ?? '';
+});
+
+
+//Use to Save Assigned PSC
+$('#confirmAssign').click(function(){
+
+    let selected = [];
+
+    $('.participant_checkbox:checked').each(function(){
+        selected.push($(this).val());
+    });
+
+    let psc_id = $('#psc_id').val();
+
+    $.ajax({
+        url: '/participants/bulk-assign',
+        type: 'POST',
+        data:{
+            _token      : "{{ csrf_token() }}",
+            participants: selected,
+            psc_id      : psc_id
+        },
+        success:function(){
+
+                 Swal.fire({
+                icon             : 'success',
+                title            : 'Saved!',
+                text             : 'Successfully Assigned Agent.',
+                timer            : 2000,
+                showConfirmButton: false,
+                toast            : true,
+                position         : 'top-center'
+                 });
+            $('#assignModal').modal('hide');
+            loadCompanies();
+
+        }
+    });
+
+});
+
+
+$(document).on('click','.btnAddContact', function(){
+
+    let companyId = $(this).data('id');
+
+    //window.location.href ="http://127.0.0.1:8000/participant/create?company_id=" + companyId;
+     window.location.href = "/participant/create?company_id=" + companyId;
+
+});
+
+
+$('#bulkAssignBtn').click(function(){
+
+    let selected = [];
+
+    $('.participant_checkbox:checked').each(function(){
+        selected.push($(this).val());
+    });
+
+    if(selected.length === 0){
+            Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'Please select at least one participant',
+            confirmButtonText: 'OK',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            backdrop: true
+                });
+
+        return;
+    }
+
+    $('#assignModal').modal('show');
+
+});
+
+
+
+//Use to view Photo in carousel design
+$(document).on('click','.viewImages', function(){
+    let participant_id = $(this).data('participant-id');
+    $.get("/participants/images/"+participant_id, function(images){
+        let html = '';
+        $.each(images, function(i,img){
+            html += `
+            <div class="carousel-item ${i === 0 ? 'active' : ''}">
+                <img src="/storage/participants/${img.image_name}" class="d-block w-100">
+            </div>`;
+        });
+        $('#carouselImages').html(html);
+        $('#imageCarouselModal').modal('show');
+    });
+});
+
+
+//Use to open the Modal and display details about company
+$(document).on('click', '#UpdateAddressModal', function(){
+
+    var c_id         = $(this).data('c_id');
+    var company_name = $(this).data('company_name');
+    var status       = $(this).data('status');
+
+    //alert(company_name)
+
+    $('#company_name').text(company_name);
+     $('#company_id').val(c_id);
+    $('#status').val(status);
+
+    
+    $('#AddressModal').modal('show');
+});
+
+
+
+//Use to open the Modal Updating Contact Person Form
+//By Clicking the Edit BUtton per Contact
+$(document).on('click', '#UpdateContact', function(){
+
+    var p_id        = $(this).data('id');
+    var companyname = $(this).data('companyname');
+    var name        = $(this).data('name');
+    var email       = $(this).data('email');
+    var contact     = $(this).data('contact');
+
+    console.log(companyname);
+    //alert(company_name)
+
+    $('#contact_company_name').text(companyname);
+    $('#p_id').val(p_id);
+    $('#participant_name').val(name);
+    $('#participant_email').val(email);
+    $('#participant_contact').val(contact);
+
+    
+    $('#ContactPersonUpdateModal').modal('show');
+});
+
+
+//Use to update CompanyAddress
+$('#saveAddress').click(function(){
+
+    let company_id = $('#company_id').val();
+    let address    = $('#Address').val();
+
+   console.log(address)
+
+    $.ajax({
+        url: '/companies/update-address',
+        type: 'POST',
+        data: {
+            _token    : '{{ csrf_token() }}',
+            company_id: company_id,
+            address   : address
+        },
+        success: function(response){
+            $('#CompanyTbl').DataTable().ajax.reload(null, false);
+           // alert('Address updated!');
+            Swal.fire({
+                icon             : 'success',
+                title            : 'Saved!',
+                text             : 'Company Address has been updated!',
+                timer            : 2000,
+                showConfirmButton: false,
+                toast            : true,
+                position         : 'top-center'
+                 });
+            $('#AddressModal').modal('hide');
+            $('#Address').val('');
+          //  loadCompanies();
+          //$('#CompanyTbl').DataTable().ajax.reload();
+          loadCompanies();
+        }
+    });
+
+});
+
+
+//Use to update Contact Person Details
+$('#SaveContactUpdates').click(function(){
+
+    let p_id                = $('#p_id').val();
+    let participant_name    = $('#participant_name').val();
+    let participant_email   = $('#participant_email').val();
+    let participant_contact = $('#participant_contact').val();
+
+    $.ajax({
+        url: '/companies/update-contactdetails',
+        type: 'POST',
+        data: {
+            _token             : '{{ csrf_token() }}',
+            p_id               : p_id,
+            participant_name   : participant_name,
+            participant_email  : participant_email,
+            participant_contact: participant_contact
+   
+        },
+        success: function(response){
+          //  $('#CompanyTbl').DataTable().ajax.reload(null, false);
+           // alert('Address updated!');
+            Swal.fire({
+                icon             : 'success',
+                title            : 'Saved!',
+                text             : 'Contact Details has been updated!',
+                timer            : 2000,
+                showConfirmButton: false,
+                toast            : true,
+                position         : 'top-center'
+                 });
+            $('#ContactPersonUpdateModal').modal('hide');
+            $('#participant_name').val('');
+            $('#participant_email').val('');
+            $('#participant_contact').val('');
+          //  loadCompanies();
+          //$('#CompanyTbl').DataTable().ajax.reload();
+          loadCompanies();
+        }
+    });
+
+});
+
+//Use to open modal for updating of Attendees Status
+//Use to open the modal only
+$(document).on('click', '.btnUpdateStatus', function(){
+
+   
+});
+
+</script>
+
+<style>
+/* for LatestUpdate */
+/* CSS Styling */
+.company-header-card {
+    /* Ang iyong orihinal na blue-purple gradient base */
+    background: linear-gradient(90deg, #10063c 0%, #1e1f71 50%, #3a3b97 100%);
+    color:#fef1cf;
+    
+    /* Banayad na box shadow para magmukhang lumulutang ang header */
+    box-shadow: 0 4px 15px rgba(102, 16, 242, 0.15);
+    
+    /* Siguraduhing pantay ang transition kapag may hover effects */
+    transition: all 0.3s ease;
+}
+
+
+.MainlatestUpdate {
+  border: 1px solid #e0dbcd; /* Manipis na border sa gilid */
+  border-radius: 6px;        /* Swabeng kurba sa mga kanto */
+  overflow: hidden;          /* Para hindi lumampas ang kulay sa kurba */
+  font-family: sans-serif;
+  max-width: 500px;    
+      /* Pwede mong baguhin ang laki nito */
+}
+
+.latestUpdateHeader {
+   /* Eksaktong kulay-cream/dilaw sa header */
+  color: #faf9f8;            /* Madilim na kulay para sa text */
+  font-size: 12px;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-bottom: 1px solid #e0dbcd; /* Linya sa ilalim ng header */
+}
+
+.latestUpdateBody {
+  background-color: #ffffff; /* Puti ang loob */
+  color: #000000;
+  padding: 20px;
+  text-align: left; 
+  
+}
+
+
+
+#CapitaLized{text-transform: capitalize; font-weight: bold;}
+    
+/* For Card Design View */
+.company-header-card {
+    /* Ang iyong orihinal na blue-purple gradient base */
+    background: linear-gradient(90deg, #10063c 0%, #1e1f71 50%, #3a3b97 100%);
+    
+    /* Banayad na box shadow para magmukhang lumulutang ang header */
+    box-shadow: 0 4px 15px rgba(102, 16, 242, 0.15);
+    
+    /* Siguraduhing pantay ang transition kapag may hover effects */
+    transition: all 0.3s ease;
+}
+
+/* Hover effect para sa Edit Icon sa loob ng address */
+.company-header-card .fa-edit {
+    transition: color 0.2s ease-in-out, transform 0.2s ease;
+}
+
+.company-header-card .fa-edit:hover {
+    color: #ffffff !important; /* Nagiging purong puti kapag itinapat ang mouse */
+    transform: scale(1.15); /* Lalaki nang kaunti para madaling mapansin */
+}
+
+
+
+
+.add_contact, .btnUpdateStatus {
+  transition: all 0.2s ease-in-out; /* Para smooth ang pagbago */
+}
+
+/* Effect kapag itinapat ang mouse (Hover) */
+.add_contact:hover {
+  color: #ffc107; /* Papalitan ang kulay (hal. Yellow/Gold) */
+  transform: scale(1.2); /* Lalaki ng kaunti ang icon */
+  opacity: 0.8; /* Magiging medyo transparent */
+}
+
+.btnUpdateStatus:hover {
+  color: #ffc107; /* Papalitan ang kulay (hal. Yellow/Gold) */
+  transform: scale(1.2); /* Lalaki ng kaunti ang icon */
+  opacity: 0.8; /* Magiging medyo transparent */
+}
+
+
+
+
+    .card:hover{
+    transform: translateY(-3px);
+    transition: .2s ease;
+}
+
+.participant-img:hover{
+    transform: scale(1.05);
+    transition: .2s ease;
+}
+
+.crm-card{
+    transition: all .25s ease;
+}
+
+.crm-card:hover{
+    transform: translateY(-6px);
+    box-shadow: 0 1rem 2rem rgba(0,0,0,.15)!important;
+}
+
+.participant-img:hover{
+    transform: scale(1.08);
+    transition: .2s ease;
+}
+    </style>
+
+@endsection

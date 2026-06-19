@@ -9,5 +9,5 @@ class ContactDuplicate extends Model
 {
     use HasFactory;
     protected $table = 'contact_duplicate';
-    protected $fillable = ['entry_by','exhibit_name','date', 'time', 'name', 'company', 'title', 'phone', 'email'];
+    protected $fillable = ['entry_by','exhibit_name','date', 'time', 'name','company_id', 'company', 'title', 'phone', 'email','remarks'];
 }

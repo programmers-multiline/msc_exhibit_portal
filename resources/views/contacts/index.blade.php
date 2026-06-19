@@ -36,15 +36,13 @@
 								<div class="contact-directory-box">
 									<div class="contact-dire-info text-center">
 										<div class="contact-avatar">
-											<span>
-
-
-							@if($contact->image_name)
-    <img src="{{ asset('storage/participants/'.$contact->image_name) }}">
-@else
-   <img src="{{ asset('storage/participants/profile.png') }}" alt="{{ $contact->participant_name }}">
-@endif
-											</span>
+							<span>
+								@if($contact->image_name)
+									<img src="{{ asset('storage/participants/'.$contact->image_name) }}">
+								@else
+								<img src="{{ asset('storage/participants/profile.png') }}" alt="{{ $contact->participant_name }}">
+								@endif
+							</span>
 										</div>
 										<div class="contact-name">
 											<h4>{{ $contact->participant_name }}</h4>
