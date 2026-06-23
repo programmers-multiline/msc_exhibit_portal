@@ -138,7 +138,7 @@ if ($request->ajax()) {
 
     $users = ExternalUser::getUsersWithCompanyAndDepartment();
     //dd($users);
-    return view('Attendance.index', compact('users')); // Dito ipapakita ang HTML page
+    return view('attendance.index', compact('users')); // Dito ipapakita ang HTML page
      
  }
 

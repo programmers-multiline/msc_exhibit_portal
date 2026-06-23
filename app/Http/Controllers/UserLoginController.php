@@ -41,25 +41,7 @@ class UserLoginController extends Controller
 
     public function login_via_oms(Request $request)
     {
-        // $user_id = $request->user_id;
-
-        // $user = User::where('id', $user_id)->first();
-
-        // if ($user) {
-
-        //     Auth::login($user);
-
-        //     $request->session()->regenerate(); // IMPORTANT
-
-        //     $link = route('participants.index');
-
-        //     return response()->json([
-        //         'message' => 'User found, login link generated',
-        //         'login_link' => $link,
-        //     ], 201);
-        // }
-        // return response()->json(['message' => 'User not found'], 401);
-
+      
         $user = User::find($request->user_id);
 
        // dd($user);
@@ -75,6 +57,8 @@ class UserLoginController extends Controller
 
         return redirect()->route('contacts.viewcontacts');
     }
+
+
     public function logout()
     {
         Auth::logout();
