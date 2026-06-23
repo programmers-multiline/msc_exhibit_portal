@@ -35,46 +35,68 @@ class AssignedController extends Controller
 
        public function index(Request $request)
         {
-         $user = Auth::user();
-         $rawResults = DB::select("SELECT 
-                                cm.id as company_id,
-                                cm.company_name,
-                                cm.address,
-                                c.id as Contactid,
-                                c.name as ContactPerson,
-                                c.phone as ContactPhone,
-                                c.email as ContactEmail,
-                                a.psc_name as AgentName,
-                                cu.status as ContactUpdate,
-                                cu.description as UpdateRemarks,
-                                cu.created_at as UpdateTime,
-                                l.lead_status,
-                                l.status_percentage
+              $user       = Auth::user();
+$group_id   = $user->group_id;
 
-                            FROM company_list cm
-                            LEFT JOIN contacts c ON c.company_id = cm.id 
-                            LEFT JOIN contacts_update cu ON cu.company_id = cm.id
-                            LEFT JOIN assigned_agent a ON a.company_id = cm.id
-                            LEFT JOIN lead_agent_status l ON l.id = cu.status
-                          WHERE a.psc_name IS NOT NULL OR a.psc_name<>''
-                            ");
+$rawResults = DB::table('company_list as cm') // 1. Main table is already cm
+    ->select([
+        'cm.id as company_id', // Fixed: Changed from c.id to cm.id
+        'cm.company_name',
+        'cm.address',
+        'c.id as Contactid',
+        'c.entry_by',
+        'c.name as ContactPerson',
+        'c.phone as ContactPhone',
+        'c.email as ContactEmail',
+        'a.psc_name as AgentName',
+        'cu.status as ContactUpdate',
+        'cu.description as UpdateRemarks',
+        'cu.created_at as UpdateTime',
+        'l.lead_status',
+        'l.status_percentage',
+        'u.group_id'
+    ])
+    // 2. Removed the duplicate leftJoin('company_list as cm'...) from here
+    ->leftJoin('contacts as c', 'c.company_id', '=', 'cm.id')
+    ->leftJoin('contacts_update as cu', 'cu.company_id', '=', 'cm.id')
+    ->leftJoin('assigned_agent as a', 'a.company_id', '=', 'cm.id')
+    ->leftJoin('lead_agent_status as l', 'l.id', '=', 'cu.status')
+    ->leftJoin('users as u', 'u.emp_id', '=', 'a.psc_emp_id')
+    ->where(function($query) {
+        $query->whereNotNull('a.psc_name')
+              ->where('a.psc_name', '<>', '');
+    })
+    // KONDISYON 1: Kung ang position_id ay 157
+    ->when($user->position_id == 157, function ($query) use ($user) {
+        return $query->where('cm.assigned_psc', $user->emp_id);
+    })
+    // KONDISYON 2: Kung ang position_id ay 13
+    ->when($user->position_id == 13, function ($query) use ($user) {
+        return $query->where('u.group_id', $user->emp_id);
+    })
+    ->get();
+//dd($rawResults);
+
 
                              /*  --WHERE cm.company_name = 'ERGOTECH'  -- O gamitin ang dynamic filter mo */
 
 // I-group ang mga contact persons sa loob ng iisang object ng kompanya
 $companies = collect($rawResults)->groupBy('company_id')->map(function ($rows) {
     $first = $rows->first();
+     $last = $rows->last();
     //dd($first->UpdateRemarks);
     return [
         'company_id'        => $first->company_id,
         'company_name'      => $first->company_name,
         'address'           => $first->address ?? 'No Address',
         'AgentName'         => $first->AgentName ?? 'No Agent Assigned',
-        'ContactUpdate'     => $first->ContactUpdate ?? 'No Update Yet',
-        'lead_status'       => $first->lead_status ?? 'No Update Yet',
-        'status_percentage' => $first->status_percentage ?? 'No Percent',
-        'UpdateRemarks'     => $first->UpdateRemarks ?? 'No Remarks Available',
-        'UpdateTime'        => $first->UpdateTime ?? '--',
+       
+        'ContactUpdate'     => $last->ContactUpdate ?? 'No Update Yet',
+        'lead_status'       => $last->lead_status ?? 'No Update Yet',
+        'status_percentage' => $last->status_percentage ?? 'No Percent',
+        'UpdateRemarks'     => $last->UpdateRemarks ?? 'No Remarks Available',
+        'UpdateTime'        => $last->UpdateTime ?? '--',
+
         'contacts'          => $rows->map(function($row) {
             return [
                 'id'    => $row->Contactid,
@@ -87,6 +109,13 @@ $companies = collect($rawResults)->groupBy('company_id')->map(function ($rows) {
 }); // 💡 TINANGGAL ANG ->first() DITO PARA MAKUHA LAHAT NG KOMPANYA
 
  $lead_agent_status = DB::table('lead_agent_status')->get(); 
+
+ //use to refresh the Card page
+ if ($request->ajax()) {
+    return response()->json([
+        'companies' => $companies->values() // .values() para maging malinis na array sa JS
+    ]);
+}
 
 return view('assigned.index', compact('companies','lead_agent_status'));
    

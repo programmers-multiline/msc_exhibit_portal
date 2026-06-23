@@ -29,7 +29,8 @@ class UserLoginController extends Controller
 
            // dd($user);
  
-            return redirect('/viewcontacts');
+            return redirect('/AssignedContact');
+            
         }
 
         return back()->withErrors([
@@ -55,7 +56,7 @@ class UserLoginController extends Controller
         $request->session()->regenerate();
    
 
-        return redirect()->route('contacts.viewcontacts');
+        return redirect()->route('assigned.index');
     }
 
 

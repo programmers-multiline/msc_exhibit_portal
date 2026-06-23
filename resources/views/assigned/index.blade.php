@@ -344,51 +344,6 @@ Save Assignment
 </div>
 <!-- Ending update Contact Person Details Modal -->
 
-
-<!-- Modal to update the Status of Attendees -->
-<!--  <div class="modal fade" id="statusModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      
-      <div class="modal-header">
-        <h5 class="modal-title">Update Status</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body">
-        <input type="hidden" id="participant_id">
-        
-        <div class="mb-3">
-            <label>Select Activity1</label>
-            <select class="form-control" id="status">
-                <option value="">Select</option>
-                <option value="Phone Call">1st Phone Call</option>
-                <option value="Product Presentation">Product Presentation</option>
-                <option value="RFQ Creation">RFQ Creation</option>
-                <option value="Submitted Proposal">Submitted Proposal</option>
-                <option value="For Revision of Proposal">For Revision of Proposal</option>
-                <option value="Received Signed Proposal">Received Signed Proposal</option>
-                <option value="Received Signed Contract">Received Signed Contract</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label>Description</label>
-            <textarea class="form-control" id="description"></textarea>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" id="saveStatus">
-            Save
-        </button>
-      </div>
-
-    </div>
-  </div>
-</div> -->
-
-<!-- Ending of Modal Update Status Attendees -->
 <style>
 .participant_checkbox{
     appearance: none;
@@ -479,7 +434,11 @@ $('#saveStatus').click(function(){
                 position: 'top-center'
             });
 
-            loadCompanies();
+           // loadCompanies();
+                        setTimeout(function()
+                        {
+                         window.location.reload();
+                        }, 2000);
         }
     });
 

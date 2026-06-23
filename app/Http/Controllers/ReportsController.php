@@ -10,60 +10,75 @@ class ReportsController extends Controller
     //
     public function index()
     {
-        $reports = DB::table('attendees_list')
+       $reports = DB::table('attendance')
             ->selectRaw("
-                YEAR(year_attended) as year_per_participant,
-                SUM(CASE WHEN exhibit_name = 'WorldBex' THEN 1 ELSE 0 END) as worldbex,
-                SUM(CASE WHEN exhibit_name = 'PHILCONSTRUCT' THEN 1 ELSE 0 END) as philconstruct,
-                SUM(CASE WHEN exhibit_name = 'PHA' THEN 1 ELSE 0 END) as pha,
-                COUNT(*) as total_leads
+                YEAR(date) as year_per_participant,
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'WorldBex' THEN attendance.company_id END) as worldbex,
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'PHILCONSTRUCT' THEN attendance.company_id END) as philconstruct,
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'PHA' THEN attendance.company_id END) as pha,
+                COUNT(DISTINCT attendance.company_id) as total_leads
             ")
-            ->groupBy(DB::raw("YEAR(year_attended)"))
+            ->leftJoin('contacts_update', 'contacts_update.company_id', '=', 'attendance.company_id')
+            ->leftJoin('lead_agent_status', 'lead_agent_status.id', '=', 'contacts_update.status')
+            ->groupBy(DB::raw("YEAR(date)"))
             ->orderBy('year_per_participant', 'desc')
             ->get();
 
+
        // return view('reports.index', compact('reports'));
 
-          $reports_per_WorldBex = DB::table('attendees_list')
+          $reports_per_WorldBex = DB::table('attendance')
             ->selectRaw("
-                YEAR(year_attended) AS year_per_exhibit,
-                SUM(CASE WHEN exhibit_name = 'WorldBex' THEN 1 ELSE 0 END) AS worldbex_attendees,
-                SUM(CASE WHEN exhibit_name = 'WorldBex' AND lead_status='New Lead' THEN 1 ELSE 0 END) AS 'New_Lead',
-                SUM(CASE WHEN exhibit_name = 'WorldBex' AND lead_status<>'New Lead' AND lead_status<>'Converted'  THEN 1 ELSE 0 END) AS 'Active_Leads',
-                SUM(CASE WHEN exhibit_name = 'WorldBex' AND lead_status='Converted' THEN 1 ELSE 0 END) AS 'Converted',
-                COUNT(*) AS total_leads
+                YEAR(date) AS year_per_exhibit,
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'WorldBex' THEN attendance.company_id END) AS worldbex_attendees,
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'WorldBex' AND lead_status='New Lead' THEN attendance.company_id END) AS 'New_Lead',
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'WorldBex' AND lead_status<>'New Lead' AND lead_status<>'Converted' THEN attendance.company_id END) AS 'Active_Leads',
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'WorldBex' AND lead_status='Converted' THEN attendance.company_id END) AS 'Converted',
+                COUNT(DISTINCT attendance.company_id) AS total_leads
             ")
-            ->groupBy(DB::raw("YEAR(year_attended)"))
+            ->leftJoin('contacts_update', 'contacts_update.company_id', '=', 'attendance.company_id')
+            ->leftJoin('lead_agent_status', 'lead_agent_status.id', '=', 'contacts_update.status')
+            ->groupBy(DB::raw("YEAR(date)"))
             ->orderBy('year_per_exhibit', 'desc')
             ->get();
 
 
-            $reports_per_PhilConstruct = DB::table('attendees_list')
+
+
+          $reports_per_PhilConstruct = DB::table('attendance')
             ->selectRaw("
-                YEAR(year_attended) AS year_per_exhibit,
-                SUM(CASE WHEN exhibit_name = 'PhilConstruct' THEN 1 ELSE 0 END) AS PhilConstruct_attendees,
-                SUM(CASE WHEN exhibit_name = 'PhilConstruct' AND lead_status='New Lead' THEN 1 ELSE 0 END) AS 'New_Lead',
-                SUM(CASE WHEN exhibit_name = 'PhilConstruct' AND lead_status<>'New Lead' AND lead_status<>'Converted'  THEN 1 ELSE 0 END) AS 'Active_Leads',
-                SUM(CASE WHEN exhibit_name = 'PhilConstruct' AND lead_status='Converted' THEN 1 ELSE 0 END) AS 'Converted',
-                COUNT(*) AS total_leads
+                YEAR(date) AS year_per_exhibit,
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'PhilConstruct' THEN attendance.company_id END) AS PhilConstruct_attendees,
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'PhilConstruct' AND lead_status='New Lead' THEN attendance.company_id END) AS 'New_Lead',
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'PhilConstruct' AND lead_status<>'New Lead' AND lead_status<>'Converted' THEN attendance.company_id END) AS 'Active_Leads',
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'PhilConstruct' AND lead_status='Converted' THEN attendance.company_id END) AS 'Converted',
+                COUNT(DISTINCT attendance.company_id) AS total_leads
             ")
-            ->groupBy(DB::raw("YEAR(year_attended)"))
+            ->leftJoin('contacts_update', 'contacts_update.company_id', '=', 'attendance.company_id')
+            ->leftJoin('lead_agent_status', 'lead_agent_status.id', '=', 'contacts_update.status')
+            ->groupBy(DB::raw("YEAR(date)"))
             ->orderBy('year_per_exhibit', 'desc')
             ->get();
 
 
-             $reports_per_PHA = DB::table('attendees_list')
+
+             $reports_per_PHA = DB::table('attendance')
             ->selectRaw("
-                YEAR(year_attended) AS year_per_exhibit,
-                SUM(CASE WHEN exhibit_name = 'PHA' THEN 1 ELSE 0 END) AS PHA_attendees,
-                SUM(CASE WHEN exhibit_name = 'PHA' AND lead_status='New Lead' THEN 1 ELSE 0 END) AS 'New_Lead',
-                SUM(CASE WHEN exhibit_name = 'PHA' AND lead_status<>'New Lead' AND lead_status<>'Converted'  THEN 1 ELSE 0 END) AS 'Active_Leads',
-                SUM(CASE WHEN exhibit_name = 'PHA' AND lead_status='Converted' THEN 1 ELSE 0 END) AS 'Converted',
-                COUNT(*) AS total_leads
+                YEAR(date) AS year_per_exhibit,
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'PHA' THEN attendance.company_id END) AS PHA_attendees,
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'PHA' AND lead_status='New Lead' THEN attendance.company_id END) AS 'New_Lead',
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'PHA' AND lead_status<>'New Lead' AND lead_status<>'Converted' THEN attendance.company_id END) AS 'Active_Leads',
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'PHA' AND lead_status='Converted' THEN attendance.company_id END) AS 'Converted',
+                COUNT(DISTINCT attendance.company_id) AS total_leads
             ")
-            ->groupBy(DB::raw("YEAR(year_attended)"))
+            ->leftJoin('contacts_update', 'contacts_update.company_id', '=', 'attendance.company_id')
+            ->leftJoin('lead_agent_status', 'lead_agent_status.id', '=', 'contacts_update.status')
+            ->groupBy(DB::raw("YEAR(date)"))
             ->orderBy('year_per_exhibit', 'desc')
             ->get();
+
+            
+
 
        return view('reports.index', compact('reports', 'reports_per_WorldBex', 'reports_per_PhilConstruct','reports_per_PHA' ));
     }

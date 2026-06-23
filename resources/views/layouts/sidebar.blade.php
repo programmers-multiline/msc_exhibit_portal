@@ -12,50 +12,58 @@
 			<div class="sidebar-menu">
 				<ul id="accordion-menu">
 				
-					<li class="dropdown {{ request()->is('participant/create') ? 'active' : '' }}">
-					<!-- 	<a href="/participant/create" class="dropdown-toggle no-arrow"> -->
+					<!-- <li class="dropdown {{ request()->is('participant/create') ? 'active' : '' }}">
 						<a href="/participants/add_participant" class="dropdown-toggle no-arrow">
 							<span class="micon dw dw-invoice"></span><span class="mtext">Add Contact</span>
 						</a>
-					</li>
+					</li> -->
+					
 					<li class="dropdown {{ request()->is('company_card') || request()->is('contacts') || request()->is('participants') ? 'active' : '' }}">
 						<a href="javascript:;" class="dropdown-toggle">
-							<span class="micon dw dw-library"></span><span class="mtext">Leads</span>
+							<!-- <span class="micon dw dw-library"></span> -->
+							<i class="micon fas fa-bullseye"></i>
+							<span class="mtext">Leads</span>
 						</a>
 						<ul class="submenu">
 							<li class="{{ request()->is('AssignedContact') ? 'active' : '' }}"><a href="/AssignedContact">My Leads</a></li>
-							<li class="{{ request()->is('company_card') ? 'active' : '' }}"><a href="/company_card">Per Company</a></li>
+						<!-- 	<li class="{{ request()->is('company_card') ? 'active' : '' }}"><a href="/company_card">Per Company</a></li>
 							<li class="{{ request()->is('contacts') ? 'active' : '' }}"><a href="/contacts">Per Contacts</a></li>
-							<li class="{{ request()->is('participants') ? 'active' : '' }}"><a href="/participants">Partcipants</a></li>
+							<li class="{{ request()->is('participants') ? 'active' : '' }}"><a href="/participants">Partcipants</a></li> -->
 						</ul>
 					</li>
 
-					<li class="{{ request()->is('client') || request()->is('client/*') ? 'active' : '' }}">
+					<!-- <li class="{{ request()->is('client') || request()->is('client/*') ? 'active' : '' }}">
 						<a href="{{ url('client') }}" class="dropdown-toggle no-arrow">
 							<span class="micon dw dw-invoice"></span>
 							<span class="mtext">Client List</span>
 						</a>
-					</li>
+					</li> -->
 					<li class="{{ request()->is('import') || request()->is('import/*') ? 'active' : '' }}">
 						<a href="{{ url('import') }}" class="dropdown-toggle no-arrow">
-							<span class="micon dw dw-invoice"></span>
+							<!-- <span class="micon dw dw-invoice"></span> -->
+							<i class=" micon fas fa-upload"></i>
 							<span class="mtext">import</span>
 						</a>
 					</li>
 
+					@if(auth()->user() && auth()->user()->position_id == 13)
 					<li class="{{ request()->is('Attendance') || request()->is('Attendance/*') ? 'active' : '' }}">
 						<a href="{{ url('Attendance') }}" class="dropdown-toggle no-arrow">
-							<span class="micon dw dw-invoice"></span>
+							<!-- <span class="micon dw dw-invoice"></span> -->
+							<i class="micon fas fa-list-alt"></i>
 							<span class="mtext">Attendance</span>
 						</a>
 					</li>
 
+					
 					<li class="{{ request()->is('viewcontacts') || request()->is('viewcontacts/*') ? 'active' : '' }}">
 						<a href="{{ url('viewcontacts') }}" class="dropdown-toggle no-arrow">
-							<span class="micon dw dw-invoice"></span>
+							<!-- <span class="micon dw dw-invoice"></span> -->
+							<i class="micon fas fa-address-book"></i>
 							<span class="mtext">Contacts</span>
 						</a>
 					</li>
+					@endif
 				
 					<li>
 						<div class="dropdown-divider"></div>

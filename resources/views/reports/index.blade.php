@@ -2,497 +2,157 @@
 
 @section('content')
 
-<div class="card-box mb-30 p-3 ml-15">
-
-    <h6 class="mb-3">Exhibit Attendance Report</h6>
-   <!--  <button class="btn btn-sm btn-primary mb-2" data-toggle="modal" data-target="#addParticipantModal">Add Participant</button>
-    <button class="btn btn-sm btn-success mb-2" id="bulkAssignBtn">Assign PSC</button>
-    <button class="btn btn-sm btn-success mb-2" data-toggle="modal" data-target="#importModal">Import Excel</button> -->
-<!-- <table id="ParticipantTbl" class="table table-bordered table-responsive nowrap w-100">
-    <thead>
-        <tr>
-            <th colspan="12" class="text-center">Participants Details</th>
-            <th colspan="2" class="text-center">Agent Details</th>
-        </tr>
-
-        <tr>
-          
-            <th>#</th>
-            <th>Exhibit Name</th>
-            <th>Photo</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Company</th>
-            <th>Position</th>
-            <th>Contact#</th>
-            <th>Source</th>
-            <th>Address</th>
-            <th>Date</th>
-            <th>Remarks</th>
-            <th>Assisted by</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-</table> -->
-<table class="table table-bordered text-center table-sm">
-    <thead>
-        <tr>
-            <th>Year</th>
-            <th style="background-color:#A52A2A; color:whitesmoke;">WorldBex</th>
-            <th style="background-color:#6495ED; color:whitesmoke;">PHILCONSTRUCT</th>
-            <th style="background-color:#A9A9A9; color:whitesmoke;">PHA</th>
-            <th>Total</th>
-        </tr>
-        
-    </thead>
-
-    <tbody>
-        @foreach($reports as $row)
-        <tr>
-            <td>{{ $row->year_per_participant }}</td>
-            <td>{{ $row->worldbex }}</td>
-            <td>{{ $row->philconstruct }}</td>
-            <td>{{ $row->pha }}</td>
-            <td><strong>{{ $row->total_leads }}</strong></td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-<br>
-<hr style="height:18px; border-top: 5px solid gray; ">
-<h6 class="mb-3" style="color:#A52A2A;">WorldBex Reports</h6>
-<table class="table table-bordered text-center table-sm">
-    <thead>
-        <tr style="background-color:#A52A2A; color:whitesmoke;">
-            <th>Year</th>
-            <th>Attendance</th>
-            <th>New Leads</th>
-            <th>Active Leads</th>
-            <th>Converted</th>
-            <th>Total Amount</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach($reports_per_WorldBex as $row)
-        <tr>
-            <td>{{ $row->year_per_exhibit }}</td>
-            <td>{{ $row->worldbex_attendees }}</td>
-            <td>{{ $row->New_Lead }}</td>
-            <td>{{ $row->Active_Leads }}</td>
-            <td>{{ $row->Converted }}</td>
-            <td><strong>{{ $row->total_leads }}</strong></td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-
-
-<br>
-<hr style="height:18px; border-top: 5px solid gray; ">
-<h6 class="mb-3" style="color:#6495ED;">PhilConstruct Reports</h6>
-<table class="table table-bordered text-center table-sm">
-    <thead>
-        <tr style="background-color:#6495ED; color:whitesmoke;">
-            <th>Year</th>
-            <th>Attendance</th>
-            <th>New Leads</th>
-            <th>Active Leads</th>
-            <th>Converted</th>
-            <th>Total Amount</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach($reports_per_PhilConstruct as $row)
-        <tr>
-            <td>{{ $row->year_per_exhibit }}</td>
-            <td>{{ $row->PhilConstruct_attendees }}</td>
-            <td>{{ $row->New_Lead }}</td>
-             <td>{{ $row->Active_Leads }}</td>
-            <td>{{ $row->Converted }}</td>
-            <td><strong>{{ $row->total_leads }}</strong></td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-
-
-<br>
-<hr style="height:18px; border-top: 5px solid gray; ">
-<h6 class="mb-3" style="color:#A9A9A9;">PHA Reports</h6>
-<table class="table table-bordered text-center table-sm">
-    <thead>
-        <tr style="background-color:#A9A9A9; color:whitesmoke;">
-            <th>Year</th>
-            <th>Attendance</th>
-            <th>New Leads</th>
-            <th>Active Leads</th>
-            <th>Converted</th>
-            <th>Total Amount</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach($reports_per_PHA as $row)
-        <tr>
-            <td>{{ $row->year_per_exhibit }}</td>
-            <td>{{ $row->PHA_attendees }}</td>
-            <td>{{ $row->New_Lead }}</td>
-            <td>{{ $row->Active_Leads }}</td>
-            <td>{{ $row->Converted }}</td>
-            <td><strong>{{ $row->total_leads }}</strong></td>
-        </tr>
-        @endforeach
-    </tbody>
-</table>
-
-</div>
-
-<!-- Modal for Import function -->
- <!-- Modal -->
-<div class="modal fade" id="importModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title">Import Participants</h5>
-      </div>
-
-      <div class="modal-body">
-        <form id="importForm" enctype="multipart/form-data">
-            @csrf
-            <input type="file" name="file" class="form-control" required>
-            <br>
-            <button type="submit" class="btn btn-primary">
-                Upload & Import
-            </button>
-        </form>
-
-        <div id="importResult" class="mt-3"></div>
-      </div>
-
+<<div class="card-box mb-30 p-4 shadow-sm">
+    <!-- Main Header -->
+    <div class="d-flex align-items-center mb-4 pb-2 border-bottom">
+        <h4 class="h5 text-dark font-weight-bold mb-0">
+            <i class="fas fa-chart-bar text-secondary mr-2"></i> Exhibit Attendance Report
+        </h4>
     </div>
-  </div>
-</div>
-<!-- Ending of Modal for Import function -->
 
-
-
-<!-- Add Participant Modal -->
-<div class="modal fade" id="addParticipantModal" tabindex="-1">
-  <div class="modal-dialog modal-l">
-    <div class="modal-content">
-
-      <div class="modal-header">
-        <h5 class="modal-title">Add Participant</h5>
-        <button type="button" class="close" data-dismiss="modal">
-          <span>&times;</span>
-        </button>
-      </div>
-
-      <form id="participantForm" enctype="multipart/form-data">
-        @csrf
-
-        <div class="modal-body">
-
-        
-
-       <div class="row">
-
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label>Exhibit Name</label>
-                         <select name="exhibit_name" id="exhibit_name" class="form-control">
-                            <option value="">Select</option>
-                            <option value="PhilConstruct">PhilConstruct</option>
-                            <option value="WorldBex" selected>WorldBex</option>
-                            <option value="PHA">PHA</option>
-                        </select>
-                        <span id="error_field_exhibit_name" style="display:none; color:red;">Required Field</span>
-                    </div>
-                </div><!-- Ending of  col-sm-6-->
-
-
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label>Date of Event</label>
-                        <input type="date" name="day_num" id="day_num" value="{{ date('Y-m-d') }}"  class="form-control">
-                        <span id="error_field_day_num" style="display:none; color:red;">Required Field</span>
-                     </div>
-                </div><!-- Ending of  col-sm-6-->
-
-
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label>Agent Name</label>
-                        <select name="entry_by" id="entry_by" class="form-control">
-                            <option value="">Select</option>
-                            <option value="Allan De Leon">Allan De Leon</option>
-                            <option value="Rizzabeth Dizon">Rizzabeth Dizon</option>
-                        </select>
-                        <span id="error_field_entry_by" style="display:none; color:red;">Required Field</span>
-                    </div>
-                </div><!-- Ending of  col-sm-6-->
-                
-                
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label>Sales Manager</label>
-                        <select name="sales_manager" id="sales_manager" class="form-control">
-                            <option value="">Select</option>
-                            <option value="Louie Valenzuela">Louie Valenzuela</option>
-                            <option value="Beth Depasupil">Beth Depasupil</option>
-                            <option value="Mark Jabat">Mark Jabat</option>
-                            <option value="Jason Pascual">Jason Pascual</option>
-                            <option value="Andrea Ungco">Andrea Ungco</option>
-                        </select>
-                        <span id="error_field_sales_manager" style="display:none; color:red;">Required Field</span>
-                    </div>
-                 </div><!-- Ending of  col-sm-6-->
-            
-                 <div class="col-sm-12 mb-2 text-warning bg bg-dark p-2">
-               <!--   <hr class="w-100 mb-2">    -->
-                 Participant Details
-                 <!-- <hr class="w-100 mb-2">    -->
-                </div><!-- Ending of  col-sm-12-->
-
-
-            <div class="col-sm-6">
-                 <div class="form-group">
-                <label>Name of Partcipant</label>
-                <input type="text" name="participant_name" id="participant_name" class="form-control">
-                <span id="error_field_participant_name" style="display:none; color:red;">Required Field</span>
-            </div>
-
-            </div><!-- Ending of  col-sm-6-->
-
-
-             <div class="col-sm-6">
-                <div class="form-group">
-                    <label>Email of Partcipant</label>
-                    <input type="text" name="participant_email"  id="participant_email" class="form-control">
-                    <span id="error_field_participant_email" style="display:none; color:red;">Required Field</span>
-                </div>
-
-            </div><!-- Ending of  col-sm-6-->
-
-
-
-             <div class="col-sm-6">
-              <div class="form-group">
-                <label>Position</label>
-                <input type="text" name="participant_position" id="participant_position" class="form-control">
-                <span id="error_field_participant_position" style="display:none; color:red;">Required Field</span>
-             </div>
-
-            </div><!-- Ending of  col-sm-6-->
-
-
-             <div class="col-sm-6">
-                <div class="form-group">
-                <label>Contact#</label>
-                <input type="text" name="participant_contact" id="participant_contact" class="form-control">
-                <span id="error_field_participant_contact" style="display:none; color:red;">Required Field</span>
-             </div>
-
-            </div><!-- Ending of  col-sm-6-->
-
-
-
-
-            <div class="col-sm-6">
-               <div class="form-group">
-                <label>Company/School of Partcipant</label>
-                <input type="text" name="participant_company" id="participant_company" class="form-control">
-                <span id="error_field_participant_company" style="display:none; color:red;">Required Field</span>
-             </div>
-
-            </div><!-- Ending of  col-sm-6-->
-
-
-             <div class="col-sm-6">
-                <div class="form-group">
-                <label>Address of Partcipant</label>
-                <input type="text" name="participant_address" id="participant_address" class="form-control">
-                <span id="error_field_participant_address" style="display:none; color:red;">Required Field</span>
-             </div>
-            </div><!-- Ending of  col-sm-6-->
-
-             <div class="col-sm-6">
-                <div class="form-group">
-                    <label>Inquiry of Partcipant</label>
-                    <input type="text" name="participant_remarks" id="participant_remarks" class="form-control">
-                    <span id="error_field_participant_remarks" style="display:none; color:red;">Required Field</span>
-                </div>
-            </div><!-- Ending of  col-sm-6-->
-
-
-             <div class="col-sm-6">
-                <div class="form-group">
-                <label>Upload Photo</label>
-                <input type="file" name="participant_photo[]" id="participantPhoto" class="form-control" multiple>
-                <span id="error_field_participant_photo" style="display:none; color:red;">Required Field</span>
-             </div>
-            </div><!-- Ending of  col-sm-6-->
-
-
-             <div class="col-sm-12">
-                    <div class="form-group">
-                        <label>Source</label>
-                        <select name="participant_source" id="participant_source" class="form-control">
-                            <option value="">Select</option>
-                            <option value="Contact Info">Contact Info</option>
-                            <option value="Viber">Viber</option>
-                            <option value="Messenger">Messenger</option>
-                            <option value="Calling Card">Calling Card</option>
-                            <option value="Customer Inquiry Form">Customer Inquiry Form</option>
-                            <option value="Contacts w/ Inquiry">Contacts w/ Inquiry</option>
-                            
-                        </select>
-                        <span id="error_field_participant_source" style="display:none; color:red;">Required Field</span>
-                    </div>
-                 </div><!-- Ending of  col-sm-6-->
-
-  
-        </div><!-- Ending of  row-->
-
-        
-        </div>
-
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-success" id="saveParticipant">Save</button>
-        </div>
-
-      </form>
-
+    <!-- Main Overview Table -->
+    <div class="table-responsive mb-15">
+        <table class="table table-hover table-striped text-center align-middle border">
+            <thead class="bg-light text-secondary font-weight-bold">
+                <tr>
+                    <th class="text-left pl-3">Year</th>
+                    <th style="border-top: 3px solid #A52A2A;">WorldBex</th>
+                    <th style="border-top: 3px solid #6495ED;">PHILCONSTRUCT</th>
+                    <th style="border-top: 3px solid #A9A9A9;">PHA</th>
+                    <th class="bg-dark text-white">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($reports as $row)
+                <tr>
+                    <td class="text-left pl-3 font-weight-bold text-secondary">{{ $row->year_per_participant }}</td>
+                    <td class="text-danger font-weight-bold">{{ $row->worldbex }}</td>
+                    <td class="text-primary font-weight-bold">{{ $row->philconstruct }}</td>
+                    <td class="text-muted font-weight-bold">{{ $row->pha }}</td>
+                    <td class="table-dark font-weight-bold">{{ $row->total_leads }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
-  </div>
-</div>
 
+    <!-- WORLDBEX SECTION -->
+    <div class="mb-15">
+        <div class="d-flex align-items-center mb-3">
+            <span class="badge badge-pill mr-2" style="background-color: #A52A2A; width: 12px; height: 12px;">&nbsp;</span>
+            <h5 class="h6 font-weight-bold mb-0" style="color: #A52A2A;">WorldBex Breakdown</h5>
+        </div>
+        <div class="table-responsive border rounded">
+            <table class="table table-hover text-center align-middle mb-0">
+                <thead class="text-white" style="background-color: #A52A2A;">
+                    <tr>
+                        <th>Year</th>
+                        <th>Attendance</th>
+                        <th>New Leads</th>
+                        <th>Active Leads</th>
+                        <th>Converted</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($reports_per_WorldBex as $row)
+                    <tr>
+                        <td class="font-weight-bold text-secondary">{{ $row->year_per_exhibit }}</td>
+                        <td>{{ $row->worldbex_attendees }}</td>
+                        <td><span class="badge badge-warning text-dark">{{ $row->New_Lead }}</span></td>
+                        <td><span class="badge badge-info">{{ $row->Active_Leads }}</span></td>
+                        <td><span class="badge badge-success">{{ $row->Converted }}</span></td>
+                        <td class="font-weight-bold text-dark table-light">{{ $row->total_leads }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-<!-- For Carousel Modal -->
-<div class="modal fade" id="imageCarouselModal">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
+    <!-- PHILCONSTRUCT SECTION -->
+    <div class="mb-15">
+        <div class="d-flex align-items-center mb-3">
+            <span class="badge badge-pill mr-2" style="background-color: #6495ED; width: 12px; height: 12px;">&nbsp;</span>
+            <h5 class="h6 font-weight-bold mb-0" style="color: #6495ED;">PhilConstruct Breakdown</h5>
+        </div>
+        <div class="table-responsive border rounded">
+            <table class="table table-hover text-center align-middle mb-0">
+                <thead class="text-white" style="background-color: #6495ED;">
+                    <tr>
+                        <th>Year</th>
+                        <th>Attendance</th>
+                        <th>New Leads</th>
+                        <th>Active Leads</th>
+                        <th>Converted</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($reports_per_PhilConstruct as $row)
+                    <tr>
+                        <td class="font-weight-bold text-secondary">{{ $row->year_per_exhibit }}</td>
+                        <td>{{ $row->PhilConstruct_attendees }}</td>
+                        <td><span class="badge badge-warning text-dark">{{ $row->New_Lead }}</span></td>
+                        <td><span class="badge badge-info">{{ $row->Active_Leads }}</span></td>
+                        <td><span class="badge badge-success">{{ $row->Converted }}</span></td>
+                        <td class="font-weight-bold text-dark table-light">{{ $row->total_leads }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-            <div class="modal-body">
-
-                <div id="participantCarousel" class="carousel slide" data-ride="carousel">
-
-                    <div class="carousel-inner" id="carouselImages">
-                        <!-- Images will be inserted here via JS -->
-                    </div>
-
-                    <a class="carousel-control-prev" href="#participantCarousel" data-slide="prev">
-                        <span class="carousel-control-prev-icon"></span>
-                    </a>
-
-                    <a class="carousel-control-next" href="#participantCarousel" data-slide="next">
-                        <span class="carousel-control-next-icon"></span>
-                    </a>
-
-                </div>
-
-            </div>
-
+    <!-- PHA SECTION -->
+    <div class="mb-3">
+        <div class="d-flex align-items-center mb-3">
+            <span class="badge badge-pill mr-2" style="background-color: #A9A9A9; width: 12px; height: 12px;">&nbsp;</span>
+            <h5 class="h6 font-weight-bold mb-0" style="color: #A9A9A9;">PHA Breakdown</h5>
+        </div>
+        <div class="table-responsive border rounded">
+            <table class="table table-hover text-center align-middle mb-0">
+                <thead class="text-white" style="background-color: #A9A9A9;">
+                    <tr>
+                        <th>Year</th>
+                        <th>Attendance</th>
+                        <th>New Leads</th>
+                        <th>Active Leads</th>
+                        <th>Converted</th>
+                        <th>Total Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($reports_per_PHA as $row)
+                    <tr>
+                        <td class="font-weight-bold text-secondary">{{ $row->year_per_exhibit }}</td>
+                        <td>{{ $row->PHA_attendees }}</td>
+                        <td><span class="badge badge-warning text-dark">{{ $row->New_Lead }}</span></td>
+                        <td><span class="badge badge-info">{{ $row->Active_Leads }}</span></td>
+                        <td><span class="badge badge-success">{{ $row->Converted }}</span></td>
+                        <td class="font-weight-bold text-dark table-light">{{ $row->total_leads }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
-<!-- Ending of Carousel Modal -->
-
-<!-- Modal to update the Status of Attendees -->
- <div class="modal fade" id="statusModal">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      
-      <div class="modal-header">
-        <h5 class="modal-title">Update Status</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-
-      <div class="modal-body">
-        <input type="hidden" id="participant_id">
-        
-        <div class="mb-3">
-            <label>Select Activity</label>
-            <select class="form-control" id="status">
-                <option value="">Select</option>
-                <option value="Phone Call">1st Phone Call</option>
-                <option value="Product Presentation">Product Presentation</option>
-                <option value="RFQ Creation">RFQ Creation</option>
-                <option value="Submitted Proposal">Submitted Proposal</option>
-                <option value="For Revision of Proposal">For Revision of Proposal</option>
-                <option value="Received Signed Proposal">Received Signed Proposal</option>
-                <option value="Received Signed Contract">Received Signed Contract</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label>Description</label>
-            <textarea class="form-control" id="description"></textarea>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn btn-success" id="saveStatus">
-            Save
-        </button>
-      </div>
-
-    </div>
-  </div>
-</div>
-
-<!-- Ending of Modal Update Status Attendees -->
-
-
-<!-- MOdal for Assigning of PSC -->
- <div class="modal fade" id="assignModal">
-<div class="modal-dialog">
-<div class="modal-content">
-
-<div class="modal-header">
-<h5>Assign PSC</h5>
-</div>
-
-<div class="modal-body">
 
 
 
-</div>
 
-<div class="modal-footer">
-<button class="btn btn-primary" id="confirmAssign">
-Save Assignment
-</button>
-</div>
 
-</div>
-</div>
-</div>
- <!-- Ending of Modal Assigning of PSC -->
+
+
+
+
+
 
 @endsection
 
 
 @section('scripts')
-<!-- DataTable CSS -->
-<!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"> -->
-<!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css"> -->
-<!-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>  -->
-
-
-<!-- @if ($errors->any())
-<script>
-    $(document).ready(function(){
-        $('#addParticipantModal').modal('show');
-    });
-</script>
-@endif -->
-
-
 
 <!-- Jquery for Import function -->
  <script>
