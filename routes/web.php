@@ -86,7 +86,14 @@ Route::get('/participant/check-duplicate',[ParticipantController::class,'checkDu
 
 //Route::post('/company/save', [CompanyController::class,'saveCompany']);
 Route::post('/company/save', [CompanyController::class,'saveCompany'])->name('company.save');
+
+
 Route::get('/download-brochure', [BrochureController::class, 'download'])->name('brochure.download');
+
+
+
+
+
 Route::middleware(['web'])->group(function(){
     Route::post('/participant/store',[ParticipantController::class,'store']);
 });
@@ -99,6 +106,22 @@ Route::get('/login', function () {
 
 Route::post('/login', [UserLoginController::class, 'login'])->name('login.custom');
 Route::get('/login-via-oms', [UserLoginController::class, 'login_via_oms']);
+
+Route::get('/partcipant', function () {
+    if (!session()->has('user')) {
+        return redirect('/login');
+    }
+    return view('partcipant');
+});
+
+Route::get('/partcipant', function () {
+     return redirect('/login');
+})->middleware('auth:login');
+
+Route::get('/', function () {
+    return view('auth.login');
+});
+
 
 Route::get('/test-mail', function() {
     $participant = (object)[
