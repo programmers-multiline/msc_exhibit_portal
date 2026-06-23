@@ -29,7 +29,7 @@ class UserLoginController extends Controller
 
            // dd($user);
  
-            return redirect('/company_card');
+            return redirect('/viewcontacts');
         }
 
         return back()->withErrors([
@@ -73,7 +73,7 @@ class UserLoginController extends Controller
         $request->session()->regenerate();
    
 
-        return redirect()->route('participants.create');
+        return redirect()->route('viewcontacts');
     }
     public function logout()
     {

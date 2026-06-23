@@ -11,7 +11,7 @@
 		<div class="pd-ltr-10 xs-pd-10-10">
 			<div class="min-height-200px"> -->
 				<div class="container pd-0">
-					<div class="page-header">
+					<!-- <div class="page-header">
 						<div class="row">
 							<div class="col-md-12 col-sm-12">
 								<div class="title">
@@ -25,7 +25,7 @@
 								</nav>
 							</div>
 						</div>
-					</div>
+					</div> -->
 <div class="container mt-5" style="max-width: 600px;">
 				<div class="card shadow">
 					<div class="card-header  text-white" style="background-color:#031e23; color:whitesmoke;">

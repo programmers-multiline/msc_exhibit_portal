@@ -23,7 +23,7 @@
 							<span class="micon dw dw-library"></span><span class="mtext">Leads</span>
 						</a>
 						<ul class="submenu">
-							<li class="{{ request()->is('AssignedContact') ? 'active' : '' }}"><a href="/AssignedContact">Assigned Contact</a></li>
+							<li class="{{ request()->is('AssignedContact') ? 'active' : '' }}"><a href="/AssignedContact">My Leads</a></li>
 							<li class="{{ request()->is('company_card') ? 'active' : '' }}"><a href="/company_card">Per Company</a></li>
 							<li class="{{ request()->is('contacts') ? 'active' : '' }}"><a href="/contacts">Per Contacts</a></li>
 							<li class="{{ request()->is('participants') ? 'active' : '' }}"><a href="/participants">Partcipants</a></li>

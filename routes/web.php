@@ -167,12 +167,9 @@ Route::post('/import', [ContactImportController::class, 'import'])->name('import
 Route::get('/Attendance', [ContactImportController::class, 'ViewAttendance'])->name('Attendance.index');
 Route::post('/Attendance/bulk-assign',[ContactImportController::class, 'bulkAssign']);
 
-Route::get('/AssignedContact', [AssignedController::class, 'index'])->middleware('auth');
+Route::get('/AssignedContact', [AssignedController::class, 'index'])->middleware('auth')->name('AsssignedContact');
 
 Route::get('/viewcontacts', [ContactImportController::class, 'ViewContacts'])->name('contacts.viewcontacts')->middleware('auth');
-
-
-
 
 
 Route::post('/AssignedContact/update-status/{id}', [ContactImportController::class, 'ContactUpdateStatus'])
