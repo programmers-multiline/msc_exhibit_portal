@@ -73,7 +73,7 @@ class UserLoginController extends Controller
         $request->session()->regenerate();
    
 
-        return redirect()->route('viewcontacts');
+        return redirect()->route('contacts.viewcontacts');
     }
     public function logout()
     {
