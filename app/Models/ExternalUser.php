@@ -39,7 +39,8 @@ class ExternalUser extends Model
                 ->where('users.status', 1)
                 ->where('oms_departments.department', 'like', '%sales%')
                 ->where('users.company_id', session('company_id'))
-                ->where('oms_departments.id', $user->department_id)
+                ->where('oms_departments.id', $user->department_id) 
+                ->where('users.group_id', $user->group_id) 
                 ->get();
         }
 }
