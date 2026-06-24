@@ -92,11 +92,17 @@
                 <div class="d-flex justify-content-between align-items-center border rounded p-2" style="background-color:#fef1cf;">
                     <span class="font-weight-bold">Agent Details</span>
                    
-                    <button class            = "btn btn-outline-success btn-sm btnUpdateStatus" id = "UpdateStatus"
-                            data-id          = "{{ $companyData['company_id'] }}"
-                            data-cname       = "{{ $companyData['company_name'] }}"
-                            data-lead_status = "{{ $companyData['ContactUpdate'] }}"
-                    ><i     class            = "fas fa-pencil-alt me-1"></i> &nbsp;Update Status</button>
+                            @if(auth()->check() && $companyData['assigned_agent_id'] == auth()->user()->emp_id)
+                                    <button class="btn btn-outline-success btn-sm btnUpdateStatus" 
+                                            id="UpdateStatus"
+                                            data-id="{{ $companyData['company_id'] }}"
+                                            data-cname="{{ $companyData['company_name'] }}"
+                                            data-lead_status="{{ $companyData['ContactUpdate'] }}">
+                                        <i class="fas fa-pencil-alt me-1"></i> &nbsp;Update Status 
+                                    </button>
+                                @endif
+                           
+
 
                 </div>
 
@@ -183,26 +189,28 @@
 <!-- Ending of Carousel Modal -->
 
 <!-- MOdal for Assigning of PSC -->
- <div class="modal fade" id="assignModal">
-<div class="modal-dialog">
-<div class="modal-content">
 
-<div class="modal-header">
-<h5>Assign PSC</h5>
-</div>
+<div class="modal fade" id="assignModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
 
-<div class="modal-body">
+            <div class="modal-header">
+            <h5>Assign PSC</h5>
+            </div>
+        </div>
 
-</div>
+    <div class="modal-body">
 
-<div class="modal-footer">
-<button class="btn btn-primary" id="confirmAssign">
-Save Assignment
-</button>
-</div>
+    
 
-</div>
-</div>
+        <div class="modal-footer">
+        <button class="btn btn-primary" id="confirmAssign">
+        Save Assignment
+        </button>
+        </div>
+
+    </div>
+    </div>
 </div>
  <!-- Ending of Modal Assigning of PSC -->
 

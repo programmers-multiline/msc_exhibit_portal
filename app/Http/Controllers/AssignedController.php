@@ -36,13 +36,16 @@ class AssignedController extends Controller
        public function index(Request $request)
         {
               $user       = Auth::user();
-$group_id   = $user->group_id;
+
+             // dd($user->position_id);
+            $group_id   = $user->group_id;
 
 $rawResults = DB::table('company_list as cm') // 1. Main table is already cm
     ->select([
         'cm.id as company_id', // Fixed: Changed from c.id to cm.id
         'cm.company_name',
         'cm.address',
+        'cm.assigned_psc',
         'c.id as Contactid',
         'c.entry_by',
         'c.name as ContactPerson',
@@ -53,6 +56,7 @@ $rawResults = DB::table('company_list as cm') // 1. Main table is already cm
         'cu.description as UpdateRemarks',
         'cu.created_at as UpdateTime',
         'l.lead_status',
+        'u.position_id',
         'l.status_percentage',
         'u.group_id'
     ])
@@ -90,7 +94,7 @@ $companies = collect($rawResults)->groupBy('company_id')->map(function ($rows) {
         'company_name'      => $first->company_name,
         'address'           => $first->address ?? 'No Address',
         'AgentName'         => $first->AgentName ?? 'No Agent Assigned',
-       
+        'assigned_agent_id' => $first->psc_emp_id ?? $first->assigned_psc,
         'ContactUpdate'     => $last->ContactUpdate ?? 'No Update Yet',
         'lead_status'       => $last->lead_status ?? 'No Update Yet',
         'status_percentage' => $last->status_percentage ?? 'No Percent',
@@ -117,7 +121,7 @@ $companies = collect($rawResults)->groupBy('company_id')->map(function ($rows) {
     ]);
 }
 
-return view('assigned.index', compact('companies','lead_agent_status'));
+return view('assigned.index', compact('companies','lead_agent_status','user'));
    
        // return view('assigned.index');
     
