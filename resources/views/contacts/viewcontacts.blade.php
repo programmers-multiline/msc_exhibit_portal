@@ -34,7 +34,7 @@
    <h3>Contact List</h3> 
 
 <div class="row p-2">
-<div class="searchingDiv w-100 mb-4 px-2">
+<div class="searchingDiv w-100  px-2">
     <!-- Ginawang iisang row ang buong filter at button container -->
 
 <form id="filterForm" class="row g-3 align-items-center">

@@ -5,6 +5,11 @@
 <div class="container-fluid mt-4">
 
     <h3 class="mb-3">My Leads</h3>
+     @if (in_array(auth()->user()->position_id, [13, 237]))
+         <button type="button" class="btn btn-success d-inline-flex align-items-center justify-content-center px-4 text-white shadow-sm" id="bulkAssignBtn" style="height: 38px;">
+           <i class="bi bi-person-plus me-2"></i> Assign PSC
+         </button>
+     @endif
  <!--    <a href="/companies">Table</a> OR <a href="/company_card">Card Format</a>
     <button id="viewAllCompany" class="btn btn-sm mb-2 btn-secondary">View All Company</button>
     <button class="btn btn-sm btn-success mb-2" id="bulkAssignBtn">Assign Agent</button>
@@ -47,9 +52,9 @@
                     <div class="progress-bar progress-bar-custom" role="progressbar" style="width: {{ $companyData['status_percentage'] }};"></div>
                 </div>
                 <div class="form-check m-0">
-                    <input class="form-check-input border-danger" type="checkbox" id="checkAssign_{{ $loop->index }}">
+                    <input class="form-check-input border-danger participant_checkbox" type="checkbox" id="checkAssign_{{ $loop->index }}" value="{{$companyData['company_id']}}">
                     <label class="form-check-label text-danger fw-medium" for="checkAssign_{{ $loop->index }}">
-                        Check to Assign Agent
+                        Check to Change PSC
                     </label>
                 </div>
             </div>
@@ -121,9 +126,16 @@
                 <div class="update-box p-1 " style="height: 110px;">
                     <div class="bg-white p-2 rounded border shadow-sm h-100" style="overflow: hidden;">
                         <div class="d-flex justify-content-between align-items-center mb-1">
-                            <span class="badge bg-success text-white py-0.5 px-1.5" style="font-size: 0.6rem;">
+                                @if($companyData['lead_status']=='No Update Yet')
+                            <span class="badge bg-danger text-white py-0.5 px-1.5" style="font-size: 0.6rem;">
                                 {{ $companyData['lead_status'] }}
                             </span>
+                            @else 
+                             <span class="badge bg-success text-white py-0.5 px-1.5" style="font-size: 0.6rem;">
+                                {{ $companyData['lead_status'] }}
+                            </span>
+                            @endif
+
                             <small class="text-muted" style="font-size: 0.6rem;">
                                 @if($companyData['UpdateTime'] && $companyData['UpdateTime'] !== '--')
                                     {{ \Carbon\Carbon::parse($companyData['UpdateTime'])->format('M d, Y h:i A') }}
@@ -189,28 +201,42 @@
 <!-- Ending of Carousel Modal -->
 
 <!-- MOdal for Assigning of PSC -->
+ <div class="modal fade" id="assignModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5>Assign PSC</h5>
+                    </div>
 
-<div class="modal fade" id="assignModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
+                    <div class="modal-body">
+                    <select id="psc_id" class="form-control">
+                   @foreach($user_group as $user)
+                        @php
+                            $fullName   = $user->first_name . ' ' . $user->last_name;
+                            $currentUrl = request()->fullUrl();
+                        @endphp
 
-            <div class="modal-header">
-            <h5>Assign PSC</h5>
+                            @if(request()->is('*AssignedContact*'))
+                                    <option value="{{$user->emp_id}}">
+                                        {{$fullName}}
+                                    </option>
+                                @else
+                                    <option value="{{$fullName}}">
+                                        {{$fullName}}
+                                    </option>
+                                @endif
+                        @endforeach
+                    </select>
+                    </div>
+
+                    <div class="modal-footer">
+                    <button class="btn btn-primary" id="confirmAssign">
+                    Save Assignment
+                    </button>
+                    </div>
+
+                </div>
             </div>
-        </div>
-
-    <div class="modal-body">
-
-    
-
-        <div class="modal-footer">
-        <button class="btn btn-primary" id="confirmAssign">
-        Save Assignment
-        </button>
-        </div>
-
-    </div>
-    </div>
 </div>
  <!-- Ending of Modal Assigning of PSC -->
 
@@ -545,28 +571,33 @@ $('#confirmAssign').click(function(){
     let psc_id = $('#psc_id').val();
 
     $.ajax({
-        url: '/participants/bulk-assign',
+        url: '/Attendance/bulk-assign',
         type: 'POST',
         data:{
-            _token      : "{{ csrf_token() }}",
-            participants: selected,
-            psc_id      : psc_id
+            _token  : "{{ csrf_token() }}",
+            attendee: selected,
+            psc_id  : psc_id
         },
-        success:function(){
+           success: function() {
+                Swal.fire({
+                    icon             : 'success',
+                    title            : 'Saved!',
+                    text             : 'Successfully Assigned Agent.',
+                    timer            : 2000,
+                    showConfirmButton: false,
+                    toast            : true,
+                    position         : 'top-center'
+                }).then(() => {
+                    // MAAARI MO ITONG ILAGAY DITO PARA MAG-RELOAD MATAPOS ANG TIMER (2000ms)
+                    location.reload();
+                });
 
-                 Swal.fire({
-                icon             : 'success',
-                title            : 'Saved!',
-                text             : 'Successfully Assigned Agent.',
-                timer            : 2000,
-                showConfirmButton: false,
-                toast            : true,
-                position         : 'top-center'
-                 });
-            $('#assignModal').modal('hide');
-            loadCompanies();
+                $('#assignModal').modal('hide');
+                
+                // KUNG GUSTO MO NAMANG MAG-RELOAD AGAD NANG HINDI HINAHANTAY ANG TIMER:
+                // location.reload();
+            }
 
-        }
     });
 
 });

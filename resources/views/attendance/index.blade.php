@@ -76,13 +76,13 @@
 
         <!-- Assign PSC Button -->
         <!-- Ginawang d-flex at align-items-center kasama ang justify-content-md-end para manatili sa kanan -->
-        <div class="col-3 col-md-3 d-flex align-items-center justify-content-md-start">
+        <!-- <div class="col-3 col-md-3 d-flex align-items-center justify-content-md-start">
             @if (in_array(auth()->user()->position_id, [13, 237]))
-                <button type="button" class="btn btn-success d-inline-flex align-items-center justify-content-center px-4 shadow-sm text-white" id="bulkAssignBtn">
+                <button type="button" class="btn btn-success d-inline-flex align-items-center justify-content-center px-4 shadow-sm text-white" id="">
                     <i class="bi bi-person-plus me-2"></i> Assign PSC
                 </button>
             @endif
-        </div>
+        </div> -->
 
 
     </form>
@@ -98,6 +98,15 @@
     <div class="card-body p-4">
         <!-- Wrapper para sa responsive table para hindi masira ang layout -->
         <div class="table-responsive">
+            
+            <div id="assignPscWrapper" class="d-none ms-3">
+                @if (in_array(auth()->user()->position_id, [13, 237]))
+                    <button type="button" class="btn btn-success d-inline-flex align-items-center justify-content-center px-4 text-white shadow-sm" id="bulkAssignBtn" style="height: 38px;">
+                        <i class="bi bi-person-plus me-2"></i> Assign PSC
+                    </button>
+                @endif
+            </div>
+
             <table id="AttendanceTbl" class="table table-striped table-hover align-middle nowrap w-100" style="margin-top: 15px !important;">
                 <thead class="table-dark text-uppercase fs-3 tracking-wider">
                     <tr>
@@ -292,7 +301,7 @@ $('#confirmAssign').click(function(){
             $('#assignModal').modal('hide');
 
             // Reload Table
-            $('#ParticipantTbl').DataTable().ajax.reload(null,false);
+            $('#AttendanceTbl').DataTable().ajax.reload(null,false);
 
             //alert("Successfully Assigned!");
              Swal.fire({
@@ -373,7 +382,7 @@ function loadAttendance()
         },
 
         columns: [
-            { data: 'checkbox', name: 'checkbox', orderable:false, searchable:false },
+            { data: 'checkbox', name: 'checkbox'},
             { data: 'exhibit_name', name: 'attendance.exhibit_name' },
             { data: 'company_name', name: 'company_list.company_name' },
             { data: 'contact_name', name: 'attendance.name' },
@@ -384,7 +393,20 @@ function loadAttendance()
             { data: 'Entry_by', name: 'users.name' },
             { data: 'action', name: 'action', orderable: false, searchable: false }
       
-        ]
+        ],
+// DITO ILALAGAY ANG LOGIC PARA SA ALIGNMENT
+       initComplete: function() {
+                // Gawing flexbox ang container ng "Show entries"
+                $('.dataTables_length').addClass('d-flex align-items-center');
+
+                // Ilipat ang wrapper at puwersahin ang espasyo gamit ang inline style css
+                $('#assignPscWrapper').removeClass('d-none')
+                                    .css('margin-left', '20px') // <--- Ito ang puwersahang maglalagay ng 20px na space
+                                    .appendTo('.dataTables_length');
+            }
+
+
+
     });
 }
 

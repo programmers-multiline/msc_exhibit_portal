@@ -89,6 +89,7 @@ if ($request->ajax()) {
             ->leftJoin('users', 'contacts.entry_by', '=', 'users.emp_id')
             ->leftJoin('company_list', 'company_list.id', '=', 'contacts.company_id')
             ->leftJoin('assigned_agent', 'company_list.id', '=', 'assigned_agent.company_id')
+            ->leftJoin('users as ua', 'assigned_agent.psc_emp_id', '=', 'ua.emp_id')
             ->select([
                 'contacts.entry_by',
                 'contacts.exhibit_name',
@@ -101,7 +102,8 @@ if ($request->ajax()) {
                 'contacts.phone',
                 'contacts.email', 
                 'users.name AS Entry_by',
-                'assigned_agent.psc_name'       
+                'assigned_agent.psc_name',
+                'ua.last_name'       
             ]);
 
         // 2. Date Filtering Logic para sa Contacts
@@ -124,7 +126,7 @@ if ($request->ajax()) {
                 if (!empty($row->psc_name)) {
                     // Inayos ang font-size style na may 'px'
                     return '<span class="btn btn-sm btn btn-outline-success">'
-                               .$row->psc_name.
+                               .$row->last_name.
                            '</span>';
                 } else if (in_array(auth()->user()->position_id, [13, 237])) {
                     return '<input type="checkbox" class="participant_checkbox" value="'.$row->company_id.'">';
@@ -157,6 +159,7 @@ if ($request->ajax()) {
                     ->leftJoin('users', 'attendance.entry_by', '=', 'users.emp_id')
                     ->leftJoin('company_list', 'company_list.id', '=', 'attendance.company_id')
                     ->leftJoin('assigned_agent', 'company_list.id', '=', 'assigned_agent.company_id')
+                    ->leftJoin('users as ua', 'assigned_agent.psc_emp_id', '=', 'ua.emp_id')
                     ->select([
                         'attendance.entry_by',
                         'attendance.exhibit_name',
@@ -169,7 +172,8 @@ if ($request->ajax()) {
                         'attendance.phone',
                         'attendance.email as contact_email', 
                         'users.name as Entry_by',
-                        'assigned_agent.psc_name'       
+                        'assigned_agent.psc_name',
+                        'ua.last_name'         
                     ]); // May semicolon na rito para i-save sa variable
 
         // 2. Date Filtering Logic (Ika-kabit sa $query variable)
@@ -190,8 +194,8 @@ if ($request->ajax()) {
         return DataTables::of($query)
             ->addColumn('checkbox', function($row){
                 if (!empty($row->psc_name)) {
-                    return '<span class="btn btn-sm btn btn-outline-success" style="font-size:8px">' // Dinagdagan ng 'px' ang font-size
-                               .$row->psc_name.
+                    return '<span class="btn btn-sm btn btn-outline-success">' // Dinagdagan ng 'px' ang font-size
+                               .$row->last_name.
                            '</span>';
                 } else if (in_array(auth()->user()->position_id, [13, 237])) {
                     return '<input type="checkbox" class="participant_checkbox" value="'.$row->company_id.'">';

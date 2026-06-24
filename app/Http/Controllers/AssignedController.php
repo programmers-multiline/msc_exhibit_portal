@@ -112,7 +112,8 @@ $companies = collect($rawResults)->groupBy('company_id')->map(function ($rows) {
     ];
 }); // 💡 TINANGGAL ANG ->first() DITO PARA MAKUHA LAHAT NG KOMPANYA
 
- $lead_agent_status = DB::table('lead_agent_status')->get(); 
+ $lead_agent_status = DB::table('lead_agent_status')->get();
+ $user_group        = DB::table('users')->where('group_id',$user->emp_id)->get();
 
  //use to refresh the Card page
  if ($request->ajax()) {
@@ -121,7 +122,7 @@ $companies = collect($rawResults)->groupBy('company_id')->map(function ($rows) {
     ]);
 }
 
-return view('assigned.index', compact('companies','lead_agent_status','user'));
+return view('assigned.index', compact('companies','lead_agent_status','user_group','user'));
    
        // return view('assigned.index');
     
