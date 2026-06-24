@@ -31,54 +31,81 @@
 
 <div class="card-box mb-30 p-3 ml-15">
 
-    
+   <h3>Contact List</h3> 
 
-   <div class="row p-2 w-100">
-		<div class="col-sm-6">
-			<span class="mb-3 h3 ">Contact List</span>
-				@if (in_array(auth()->user()->position_id, [13, 237]))
-				<button class="btn btn-sm btn-success mb-2" id="bulkAssignBtn">Assign PSC</button>
-				@endif
-		</div>
-   		
-      
-        <div class="col-sm-6 searchingDiv text-right">
-                <form>
-                <label for="start">Start Date:</label>
-                <input type="date" id="start" name="startDate">
+<div class="row p-2">
+<div class="searchingDiv w-100 mb-4 px-2">
+    <!-- Ginawang iisang row ang buong filter at button container -->
 
-                <label for="end">End Date:</label>
-                <input type="date" id="end" name="endDate">
-                <button class="btn btn-outline-secondary mb-2">Filter</button>
-                </form>
+<form id="filterForm" class="row g-3 align-items-center">
 
-                <script>
-                const startDateInput = document.getElementById('start');
-                const endDateInput   = document.getElementById('end');
-
-                // When start date changes, end date cannot be earlier than start date
-                startDateInput.addEventListener('change', function() {
-                    if (this.value) {
-                    endDateInput.min = this.value;
-                    }
-                });
-
-                // When end date changes, start date cannot be later than end date
-                endDateInput.addEventListener('change', function() {
-                    if (this.value) {
-                    startDateInput.max = this.value;
-                    }
-                });
-                </script>
+        
+        <!-- Start Date Field -->
+        <div class="col-3 col-md-3">
+            <label for="start" class="form-label small fw-bold text-muted mb-1">Start Date</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-secondary border-end-0">
+                    <i class="bi bi-calendar-event"></i>
+                </span>
+                <input type="date" id="start" name="startDate" class="form-control ps-1 shadow-none">
             </div>
-            <!-- Ending of SearchingDiv -->
-			 
+        </div>
+
+        <!-- End Date Field -->
+        <div class="col-3 col-md-3 ">
+            <label for="end" class="form-label small fw-bold text-muted mb-1">End Date</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-secondary border-end-0">
+                    <i class="bi bi-calendar-check"></i>
+                </span>
+                <input type="date" id="end" name="endDate" class="form-control ps-1 shadow-none">
+            </div>
+        </div>
+
+        <!-- Action Buttons (Filter & Clear) -->
+                <!-- Action Buttons (Filter & Clear) -->
+        <!-- Idinagdag ang align-items-center dito -->
+        <div class="col-3 col-md-3 d-flex gap-2 align-items-center">
+            <button type="submit" class="btn btn-primary d-inline-flex align-items-center justify-content-center px-4 shadow-sm w-25">
+                <i class="bi bi-filter-square me-2"></i> Filter
+            </button>&nbsp;
+            <button type="button" id="resetFilterBtn" class="btn btn-outline-secondary d-inline-flex align-items-center justify-content-center px-3 w-25">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Clear
+            </button>
+        </div>
+
+        <!-- Assign PSC Button -->
+        <!-- Ginawang d-flex at align-items-center kasama ang justify-content-md-end para manatili sa kanan -->
+       <!--  <div class="col-3 col-md-3 d-flex align-items-center justify-content-md-start">
+            @if (in_array(auth()->user()->position_id, [13, 237]))
+                <button type="button" class="btn btn-success d-inline-flex align-items-center justify-content-center px-4 shadow-sm text-white" id="">
+                    <i class="bi bi-person-plus me-2"></i> Assign PSC
+                </button>
+            @endif
+        </div> -->
+
+
+    </form>
+</div>
+
+
    </div>
+   <!-- Ending of row -->
+
 
 <div class="card shadow-sm border-0 rounded-3">
     <div class="card-body p-4">
         <!-- Wrapper para sa responsive table para hindi masira ang layout -->
         <div class="table-responsive">
+        <!-- Ilagay ito kahit saan sa iyong blade view -->
+            <div id="assignPscWrapper" class="d-none ms-3">
+                @if (in_array(auth()->user()->position_id, [13, 237]))
+                    <button type="button" class="btn btn-success d-inline-flex align-items-center justify-content-center px-4 text-white shadow-sm" id="bulkAssignBtn" style="height: 38px;">
+                        <i class="bi bi-person-plus me-2"></i> Assign PSC
+                    </button>
+                @endif
+            </div>
+
             <table id="ContactsTbl" class="table table-striped table-hover align-middle nowrap w-100" style="margin-top: 15px !important;">
                 <thead class="table-dark text-uppercase fs-3 tracking-wider">
                     <tr>
@@ -185,7 +212,24 @@ Save Assignment
 
 @section('scripts')
 
+ <script>
+const startDateInput = document.getElementById('start');
+const endDateInput   = document.getElementById('end');
 
+ // When start date changes, end date cannot be earlier than start date
+startDateInput.addEventListener('change', function() {
+    if (this.value) {
+     endDateInput.min = this.value;
+     }
+   });
+
+// When end date changes, start date cannot be later than end date
+ endDateInput.addEventListener('change', function() {
+     if (this.value) {
+     startDateInput.max = this.value;
+    }
+});
+</script>
 
 
 <script>
@@ -310,13 +354,38 @@ $(document).on('click','.viewImages', function(){
 
 $(document).ready(function(){
 
-    $('#ContactsTbl').DataTable({
+    LoadContacts();
+
+    $('.searchingDiv form').on('submit', function(e) {
+        e.preventDefault(); // Pigilan ang page reload
+        $('#ContactsTbl').DataTable().draw(); // I-refresh ang data gamit ang bagong dates
+    });
+
+ // Reset filter form at i-refresh ang table data
+    $('#resetFilterBtn').on('click', function() {
+        $('#start').val(''); // Burahin ang start date
+        $('#end').val('');   // Burahin ang end date
+        $('#ContactsTbl').DataTable().draw(); // I-refresh ang DataTables
+    });   
+   
+
+});//Ending of Document Ready
+
+function LoadContacts()
+{
+     $('#ContactsTbl').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ route('contacts.viewcontacts') }}",
+         ajax: {
+            url: "{{ route('contacts.viewcontacts') }}",
+            data: function (d) {
+                d.startDate = $('#start').val();
+                d.endDate = $('#end').val();
+            }
+        },
 
        columns: [
-        { data: 'checkbox', name: 'checkbox', orderable: false, searchable: false },
+        { data: 'checkbox', name: 'checkbox'},
         { data: 'exhibit_name', name: 'contacts.exhibit_name' },
         { data: 'company_name', name: 'company_list.company_name' },
         { data: 'contact_name', name: 'contacts.name' }, 
@@ -326,12 +395,21 @@ $(document).ready(function(){
         { data: 'time', name: 'contacts.time' },
         { data: 'Entry_by', name: 'users.name' }, 
         { data: 'action', name: 'action', orderable: false, searchable: false }
-    ]
+    ],
+// DITO ILALAGAY ANG LOGIC PARA SA ALIGNMENT
+       initComplete: function() {
+                // Gawing flexbox ang container ng "Show entries"
+                $('.dataTables_length').addClass('d-flex align-items-center');
+
+                // Ilipat ang wrapper at puwersahin ang espasyo gamit ang inline style css
+                $('#assignPscWrapper').removeClass('d-none')
+                                    .css('margin-left', '20px') // <--- Ito ang puwersahang maglalagay ng 20px na space
+                                    .appendTo('.dataTables_length');
+            }
+
+
     });
-
-});//Ending of Document Ready
-
-
+}
 
 </script>
 @endsection

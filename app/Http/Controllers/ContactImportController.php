@@ -23,7 +23,7 @@ use App\Models\ContactsUpdate;
 class ContactImportController extends Controller
 {
 
-public function ViewContacts(Request $request)
+/* public function ViewContacts(Request $request)
     {
            
 if ($request->ajax()) {
@@ -77,15 +77,83 @@ if ($request->ajax()) {
     //dd($users);
     return view('contacts.viewcontacts', compact('users')); // Dito ipapakita ang HTML page
      
- }
+ } */
 
-public function ViewAttendance(Request $request)
-    {
-       $user = Auth::user();    
+    public function ViewContacts(Request $request)
+{
+    $user = Auth::user();    
        
-if ($request->ajax()) {
+    if ($request->ajax()) {
+        // 1. Simulan ang query gamit ang variable ($query) at huwag lagyan ng semicolon o get() sa dulo
+        $query = DB::table('contacts')
+            ->leftJoin('users', 'contacts.entry_by', '=', 'users.emp_id')
+            ->leftJoin('company_list', 'company_list.id', '=', 'contacts.company_id')
+            ->leftJoin('assigned_agent', 'company_list.id', '=', 'assigned_agent.company_id')
+            ->select([
+                'contacts.entry_by',
+                'contacts.exhibit_name',
+                'contacts.date',
+                'contacts.time',
+                'contacts.name AS contact_name',   
+                'contacts.company_id',
+                'company_list.company_name',
+                'contacts.title',
+                'contacts.phone',
+                'contacts.email', 
+                'users.name AS Entry_by',
+                'assigned_agent.psc_name'       
+            ]);
 
-    $data = DB::table('attendance')
+        // 2. Date Filtering Logic para sa Contacts
+        if ($request->filled('startDate') && $request->filled('endDate')) {
+            $query->whereBetween('contacts.date', [$request->startDate, $request->endDate]);
+        } elseif ($request->filled('startDate')) {
+            $query->where('contacts.date', '>=', $request->startDate);
+        } elseif ($request->filled('endDate')) {
+            $query->where('contacts.date', '<=', $request->endDate);
+        }  
+
+        // 3. Position Filter Logic (Makikita lang ng user ang sarili niyang entry kapag HINDI siya position 13 o 237)
+        $query->when(!in_array($user->position_id, [13, 237]), function ($q) use ($user) {
+            return $q->where('contacts.entry_by', $user->emp_id);
+        });
+        
+        // 4. I-pasa ang Query Builder ($query) nang direkta sa DataTables
+        return DataTables::of($query)
+            ->addColumn('checkbox', function($row){
+                if (!empty($row->psc_name)) {
+                    // Inayos ang font-size style na may 'px'
+                    return '<span class="btn btn-sm btn btn-outline-success">'
+                               .$row->psc_name.
+                           '</span>';
+                } else if (in_array(auth()->user()->position_id, [13, 237])) {
+                    return '<input type="checkbox" class="participant_checkbox" value="'.$row->company_id.'">';
+                } else {
+                    return '--';
+                }
+            })
+            ->addColumn('action', function($row){
+                return '<a href="#" class="btn btn-sm btn-primary">Edit</a>';
+            })
+            ->rawColumns(['checkbox','action']) 
+            ->make(true);
+    }
+
+    $users = ExternalUser::getUsersWithCompanyAndDepartment();
+    return view('contacts.viewcontacts', compact('users')); 
+}
+
+
+
+
+ public function ViewAttendance(Request $request)
+{
+    $user = Auth::user();    
+       
+    if ($request->ajax()) {
+
+        // 1. Simulan ang query gamit ang variable name na $query (Huwag muna mag-get() o mag-semicolon)
+        $query = DB::table('attendance')
                     ->leftJoin('users', 'attendance.entry_by', '=', 'users.emp_id')
                     ->leftJoin('company_list', 'company_list.id', '=', 'attendance.company_id')
                     ->leftJoin('assigned_agent', 'company_list.id', '=', 'assigned_agent.company_id')
@@ -102,45 +170,46 @@ if ($request->ajax()) {
                         'attendance.email as contact_email', 
                         'users.name as Entry_by',
                         'assigned_agent.psc_name'       
-                    ])
-    // Kung HINDI 13 at HINDI 237 ang position_id, idadagdag ang kung sino ang entry_by
-    ->when(!in_array($user->position_id, [13, 237]), function ($query) use ($user) {
-        return $query->where('attendance.entry_by', $user->emp_id);
-    })
-    ->get(); // Huwag kalimutan ang ->get() para makuha ang records
+                    ]); // May semicolon na rito para i-save sa variable
 
-            
-            return DataTables::of($data)
-                ->addColumn('checkbox', function($row){
-                    // Gamitin ang check para sa position_id ng kasalukuyang naka-login na user
-                     // 1. Check kung may assigned PSC
+        // 2. Date Filtering Logic (Ika-kabit sa $query variable)
+        if ($request->filled('startDate') && $request->filled('endDate')) {
+            $query->whereBetween('attendance.date', [$request->startDate, $request->endDate]);
+        } elseif ($request->filled('startDate')) {
+            $query->where('attendance.date', '>=', $request->startDate);
+        } elseif ($request->filled('endDate')) {
+            $query->where('attendance.date', '<=', $request->endDate);
+        }  
+
+        // 3. Position Filter Logic (Ika-kabit pa rin sa $query variable)
+        $query->when(!in_array($user->position_id, [13, 237]), function ($q) use ($user) {
+            return $q->where('attendance.entry_by', $user->emp_id);
+        });
+
+        // 4. I-pasa ang Query object nang direkta sa DataTables (Wala nang ->get())
+        return DataTables::of($query)
+            ->addColumn('checkbox', function($row){
                 if (!empty($row->psc_name)) {
-                    return '<span class="btn btn-sm btn btn-outline-success" style="font-size:8">
-                               '.$row->psc_name.'
-                            </span>';
-                         }
-                    else if (in_array(auth()->user()->position_id, [13, 237])) {
-                        // Pansinin: 'contact_email' na ang ginamit natin mula sa alias sa itaas
-                        return '<input type="checkbox"
-                                class="participant_checkbox"
-                                value="'.$row->company_id.'">';
-                    } else {
-                        return '--';
-                    }
-                })
-                ->addColumn('action', function($row){
-                    // Pwede ka maglagay ng edit o delete button dito
-                    return '<a href="#" class="btn btn-sm btn-primary">Edit</a>';
-                })
-                ->rawColumns(['checkbox','action']) // Pinapayagan ang HTML sa column na ito
-                ->make(true);
+                    return '<span class="btn btn-sm btn btn-outline-success" style="font-size:8px">' // Dinagdagan ng 'px' ang font-size
+                               .$row->psc_name.
+                           '</span>';
+                } else if (in_array(auth()->user()->position_id, [13, 237])) {
+                    return '<input type="checkbox" class="participant_checkbox" value="'.$row->company_id.'">';
+                } else {
+                    return '--';
+                }
+            })
+            ->addColumn('action', function($row){
+                return '<a href="#" class="btn btn-sm btn-primary">Edit</a>';
+            })
+            ->rawColumns(['checkbox','action']) 
+            ->make(true);
     }
 
     $users = ExternalUser::getUsersWithCompanyAndDepartment();
-    //dd($users);
-    return view('attendance.index', compact('users')); // Dito ipapakita ang HTML page
-     
- }
+    return view('attendance.index', compact('users')); 
+}
+
 
     //
       // Ipapalabas ang upload form

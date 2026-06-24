@@ -33,46 +33,66 @@
 
     <h4 class="mb-3">Attendance</h4>
 
-   <div class="row p-2">
+<div class="row p-2">
+<div class="searchingDiv w-100 mb-4 px-2">
+    <!-- Ginawang iisang row ang buong filter at button container -->
 
-   <div class="buttonDiv w-25">
-     @if (in_array(auth()->user()->position_id, [13, 237]))
-    <button class="btn btn-sm btn-success mb-2" id="bulkAssignBtn">Assign PSC</button>
-    @endif
+<form id="filterForm" class="row g-3 align-items-center">
 
-        </div>
-      
-        <div class="searchingDiv w-50">
-                <form>
-                <label for="start">Start Date:</label>
-                <input type="date" id="start" name="startDate">
-
-                <label for="end">End Date:</label>
-                <input type="date" id="end" name="endDate">
-                <button class="btn btn-outline-secondary mb-2">Filter</button>
-                </form>
-
-                <script>
-                const startDateInput = document.getElementById('start');
-                const endDateInput = document.getElementById('end');
-
-                // When start date changes, end date cannot be earlier than start date
-                startDateInput.addEventListener('change', function() {
-                    if (this.value) {
-                    endDateInput.min = this.value;
-                    }
-                });
-
-                // When end date changes, start date cannot be later than end date
-                endDateInput.addEventListener('change', function() {
-                    if (this.value) {
-                    startDateInput.max = this.value;
-                    }
-                });
-                </script>
+        
+        <!-- Start Date Field -->
+        <div class="col-3 col-md-3">
+            <label for="start" class="form-label small fw-bold text-muted mb-1">Start Date</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-secondary border-end-0">
+                    <i class="bi bi-calendar-event"></i>
+                </span>
+                <input type="date" id="start" name="startDate" class="form-control ps-1 shadow-none">
             </div>
-            <!-- Ending of SearchingDiv -->
+        </div>
+
+        <!-- End Date Field -->
+        <div class="col-3 col-md-3 ">
+            <label for="end" class="form-label small fw-bold text-muted mb-1">End Date</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light text-secondary border-end-0">
+                    <i class="bi bi-calendar-check"></i>
+                </span>
+                <input type="date" id="end" name="endDate" class="form-control ps-1 shadow-none">
+            </div>
+        </div>
+
+        <!-- Action Buttons (Filter & Clear) -->
+                <!-- Action Buttons (Filter & Clear) -->
+        <!-- Idinagdag ang align-items-center dito -->
+        <div class="col-3 col-md-3 d-flex gap-2 align-items-center">
+            <button type="submit" class="btn btn-primary d-inline-flex align-items-center justify-content-center px-4 shadow-sm w-25">
+                <i class="bi bi-filter-square me-2"></i> Filter
+            </button>&nbsp;
+            <button type="button" id="resetFilterBtn" class="btn btn-outline-secondary d-inline-flex align-items-center justify-content-center px-3 w-25">
+                <i class="bi bi-arrow-counterclockwise me-1"></i> Clear
+            </button>
+        </div>
+
+        <!-- Assign PSC Button -->
+        <!-- Ginawang d-flex at align-items-center kasama ang justify-content-md-end para manatili sa kanan -->
+        <div class="col-3 col-md-3 d-flex align-items-center justify-content-md-start">
+            @if (in_array(auth()->user()->position_id, [13, 237]))
+                <button type="button" class="btn btn-success d-inline-flex align-items-center justify-content-center px-4 shadow-sm text-white" id="bulkAssignBtn">
+                    <i class="bi bi-person-plus me-2"></i> Assign PSC
+                </button>
+            @endif
+        </div>
+
+
+    </form>
+</div>
+
+
    </div>
+   <!-- Ending of row -->
+
+ 
 
 <div class="card shadow-sm border-0 rounded-3">
     <div class="card-body p-4">
@@ -139,42 +159,41 @@
 
 <!-- MOdal for Assigning of PSC -->
  <div class="modal fade" id="assignModal">
-<div class="modal-dialog">
-<div class="modal-content">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5>Assign PSC</h5>
+                    </div>
 
-<div class="modal-header">
-<h5>Assign PSC</h5>
-</div>
+                    <div class="modal-body">
+                    <select id="psc_id" class="form-control">
+                    @foreach($users as $user)
+                        @php
+                            $fullName   = $user->first_name . ' ' . $user->last_name;
+                            $currentUrl = request()->fullUrl();
+                        @endphp
 
-<div class="modal-body">
-<select id="psc_id" class="form-control">
- @foreach($users as $user)
-    @php
-        $fullName   = $user->first_name . ' ' . $user->last_name;
-        $currentUrl = request()->fullUrl();
-    @endphp
+                            @if(request()->is('*Attendance*'))
+                                    <option value="{{$user->emp_id}}">
+                                        {{$fullName}}
+                                    </option>
+                                @else
+                                    <option value="{{$fullName}}">
+                                        {{$fullName}}
+                                    </option>
+                                @endif
+                        @endforeach
+                    </select>
+                    </div>
 
-          @if(request()->is('*Attendance*'))
-                <option value="{{$user->emp_id}}">
-                    {{$fullName}}
-                </option>
-            @else
-                <option value="{{$fullName}}">
-                    {{$fullName}}
-                </option>
-            @endif
-    @endforeach
-</select>
-</div>
+                    <div class="modal-footer">
+                    <button class="btn btn-primary" id="confirmAssign">
+                    Save Assignment
+                    </button>
+                    </div>
 
-<div class="modal-footer">
-<button class="btn btn-primary" id="confirmAssign">
-Save Assignment
-</button>
-</div>
-
-</div>
-</div>
+                </div>
+            </div>
 </div>
  <!-- Ending of Modal Assigning of PSC -->
 
@@ -185,7 +204,24 @@ Save Assignment
 @section('scripts')
 
 
+ <script>
+                const startDateInput = document.getElementById('start');
+                const endDateInput   = document.getElementById('end');
 
+                // When start date changes, end date cannot be earlier than start date
+                startDateInput.addEventListener('change', function() {
+                    if (this.value) {
+                    endDateInput.min = this.value;
+                    }
+                });
+
+                // When end date changes, start date cannot be later than end date
+                endDateInput.addEventListener('change', function() {
+                    if (this.value) {
+                    startDateInput.max = this.value;
+                    }
+                });
+                </script>
 
 <script>
 //Use to multiple select participants for assigning of PSC
@@ -307,11 +343,34 @@ $(document).on('click','.viewImages', function(){
                    
 
 $(document).ready(function(){
+loadAttendance();
 
+ $('.searchingDiv form').on('submit', function(e) {
+        e.preventDefault(); // Pigilan ang page reload
+        $('#AttendanceTbl').DataTable().draw(); // I-refresh ang data gamit ang bagong dates
+    });
+
+ // Reset filter form at i-refresh ang table data
+    $('#resetFilterBtn').on('click', function() {
+        $('#start').val(''); // Burahin ang start date
+        $('#end').val('');   // Burahin ang end date
+        $('#AttendanceTbl').DataTable().draw(); // I-refresh ang DataTables
+    });   
+    
+});//Ending of Document Ready
+
+function loadAttendance()
+{
     $('#AttendanceTbl').DataTable({
         processing: true,
         serverSide: true,
-        ajax: "{{ route('Attendance.index') }}",
+       ajax: {
+            url: "{{ route('Attendance.index') }}",
+            data: function (d) {
+                d.startDate = $('#start').val();
+                d.endDate = $('#end').val();
+            }
+        },
 
         columns: [
             { data: 'checkbox', name: 'checkbox', orderable:false, searchable:false },
@@ -327,10 +386,7 @@ $(document).ready(function(){
       
         ]
     });
-
-});//Ending of Document Ready
-
-
+}
 
 </script>
 @endsection
