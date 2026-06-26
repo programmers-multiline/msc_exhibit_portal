@@ -197,7 +197,7 @@ if ($request->ajax()) {
                     return '<span class="btn btn-sm btn btn-outline-success">' // Dinagdagan ng 'px' ang font-size
                                .$row->last_name.
                            '</span>';
-                } else if (in_array(auth()->user()->position_id, [13, 237])) {
+                } else if (in_array(auth()->user()->position_id, [13, 237, 158])) {
                     return '<input type="checkbox" class="participant_checkbox" value="'.$row->company_id.'">';
                 } else {
                     return '--';
