@@ -128,7 +128,7 @@ if ($request->ajax()) {
                     return '<span class="btn btn-sm btn btn-outline-success">'
                                .$row->last_name.
                            '</span>';
-                } else if (in_array(auth()->user()->position_id, [13, 237])) {
+                } else if (in_array(auth()->user()->position_id, [13, 237,158])) {
                     return '<input type="checkbox" class="participant_checkbox" value="'.$row->company_id.'">';
                 } else {
                     return '--';
@@ -186,7 +186,7 @@ if ($request->ajax()) {
         }  
 
         // 3. Position Filter Logic (Ika-kabit pa rin sa $query variable)
-        $query->when(!in_array($user->position_id, [13, 237]), function ($q) use ($user) {
+        $query->when(!in_array($user->position_id, [13, 237,158]), function ($q) use ($user) {
             return $q->where('attendance.entry_by', $user->emp_id);
         });
 
