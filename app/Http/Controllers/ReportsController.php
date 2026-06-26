@@ -34,7 +34,7 @@ class ReportsController extends Controller
                 COUNT(DISTINCT CASE WHEN exhibit_name = 'WorldBex' AND lead_status='New Lead' THEN attendance.company_id END) AS 'New_Lead',
                 COUNT(DISTINCT CASE WHEN exhibit_name = 'WorldBex' AND lead_status<>'New Lead' AND lead_status<>'Converted' THEN attendance.company_id END) AS 'Active_Leads',
                 COUNT(DISTINCT CASE WHEN exhibit_name = 'WorldBex' AND lead_status='Converted' THEN attendance.company_id END) AS 'Converted',
-                COUNT(DISTINCT attendance.company_id) AS total_leads
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'WorldBex' THEN attendance.company_id END) AS total_leads
             ")
             ->leftJoin('contacts_update', 'contacts_update.company_id', '=', 'attendance.company_id')
             ->leftJoin('lead_agent_status', 'lead_agent_status.id', '=', 'contacts_update.status')
@@ -52,7 +52,7 @@ class ReportsController extends Controller
                 COUNT(DISTINCT CASE WHEN exhibit_name = 'PhilConstruct' AND lead_status='New Lead' THEN attendance.company_id END) AS 'New_Lead',
                 COUNT(DISTINCT CASE WHEN exhibit_name = 'PhilConstruct' AND lead_status<>'New Lead' AND lead_status<>'Converted' THEN attendance.company_id END) AS 'Active_Leads',
                 COUNT(DISTINCT CASE WHEN exhibit_name = 'PhilConstruct' AND lead_status='Converted' THEN attendance.company_id END) AS 'Converted',
-                COUNT(DISTINCT attendance.company_id) AS total_leads
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'PhilConstruct' THEN attendance.company_id END) AS total_leads
             ")
             ->leftJoin('contacts_update', 'contacts_update.company_id', '=', 'attendance.company_id')
             ->leftJoin('lead_agent_status', 'lead_agent_status.id', '=', 'contacts_update.status')
@@ -69,7 +69,7 @@ class ReportsController extends Controller
                 COUNT(DISTINCT CASE WHEN exhibit_name = 'PHA' AND lead_status='New Lead' THEN attendance.company_id END) AS 'New_Lead',
                 COUNT(DISTINCT CASE WHEN exhibit_name = 'PHA' AND lead_status<>'New Lead' AND lead_status<>'Converted' THEN attendance.company_id END) AS 'Active_Leads',
                 COUNT(DISTINCT CASE WHEN exhibit_name = 'PHA' AND lead_status='Converted' THEN attendance.company_id END) AS 'Converted',
-                COUNT(DISTINCT attendance.company_id) AS total_leads
+                COUNT(DISTINCT CASE WHEN exhibit_name = 'PHA' THEN attendance.company_id END) AS total_leads
             ")
             ->leftJoin('contacts_update', 'contacts_update.company_id', '=', 'attendance.company_id')
             ->leftJoin('lead_agent_status', 'lead_agent_status.id', '=', 'contacts_update.status')
