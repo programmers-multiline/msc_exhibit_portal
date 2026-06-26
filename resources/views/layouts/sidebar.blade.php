@@ -46,7 +46,7 @@
 						</a>
 					</li>
 
-					@if(auth()->user() && auth()->user()->position_id == 13)
+					@if(auth()->user() && (auth()->user()->position_id == 13 || auth()->user()->position_id == 158))
 					<li class="{{ request()->is('Attendance') || request()->is('Attendance/*') ? 'active' : '' }}">
 						<a href="{{ url('Attendance') }}" class="dropdown-toggle no-arrow">
 							<!-- <span class="micon dw dw-invoice"></span> -->
