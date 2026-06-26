@@ -116,7 +116,7 @@ if ($request->ajax()) {
         }  
 
         // 3. Position Filter Logic (Makikita lang ng user ang sarili niyang entry kapag HINDI siya position 13 o 237)
-        $query->when(!in_array($user->position_id, [13, 237]), function ($q) use ($user) {
+        $query->when(!in_array($user->position_id, [13, 237, 158]), function ($q) use ($user) {
             return $q->where('contacts.entry_by', $user->emp_id);
         });
         
@@ -128,7 +128,7 @@ if ($request->ajax()) {
                     return '<span class="btn btn-sm btn btn-outline-success">'
                                .$row->last_name.
                            '</span>';
-                } else if (in_array(auth()->user()->position_id, [13, 237,158])) {
+                } else if (in_array(auth()->user()->position_id, [13, 237, 158])) {
                     return '<input type="checkbox" class="participant_checkbox" value="'.$row->company_id.'">';
                 } else {
                     return '--';
