@@ -119,6 +119,7 @@
                         <th>Contact Name</th>
                         <th>Email Address</th>
                         <th>Contact #</th>
+                        <th>Remarks</th>
                         <th>Date </th>
                         <th>Time</th>
                         <th>Assisted By</th>
@@ -388,6 +389,7 @@ function loadAttendance()
             { data: 'contact_name', name: 'attendance.name' },
             { data: 'contact_email', name: 'attendance.email' },
             { data: 'phone',name: 'attendance.phone' },
+            { data: 'remarks',name: 'attendance.remarks' },
             { data: 'date', name: 'attendance.date' },
             { data: 'time', name: 'attendance.time' },
             { data: 'Entry_by', name: 'users.name' },

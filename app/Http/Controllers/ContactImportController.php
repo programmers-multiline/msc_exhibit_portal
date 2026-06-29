@@ -171,6 +171,7 @@ if ($request->ajax()) {
                         'attendance.title',
                         'attendance.phone',
                         'attendance.email as contact_email', 
+                        'attendance.remarks',
                         'users.name as Entry_by',
                         'assigned_agent.psc_name',
                         'ua.last_name'         
