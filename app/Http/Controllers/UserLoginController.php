@@ -56,7 +56,7 @@ class UserLoginController extends Controller
         $request->session()->regenerate();
    
 
-        return redirect()->route('assigned.index');
+        return redirect()->route('AsssignedContact');
     }
 
 
