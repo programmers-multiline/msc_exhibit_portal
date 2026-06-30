@@ -73,7 +73,7 @@ Route::get('/get-contacts_details/{id}', [CompanyController::class, 'Contacts_de
 
 
 
-Route::get('/reports', [ReportsController::class, 'index']);
+
 Route::get('/participant/create',[ParticipantController::class,'create']);
 Route::post('/participant/store',[ParticipantController::class,'store']);
 Route::get('/participant/check-duplicate',[ParticipantController::class,'checkDuplicate']);
@@ -174,3 +174,9 @@ Route::get('/viewcontacts', [ContactImportController::class, 'ViewContacts'])->n
 
 Route::post('/AssignedContact/update-status/{id}', [ContactImportController::class, 'ContactUpdateStatus'])
      ->name('assigned.updateStatus');
+
+    //  for Agent Report
+   
+Route::get('/reports', [ReportsController::class, 'index']);
+Route::get('/reports/agent-performance', [ReportsController::class, 'agentreport'])->name('reports.agent');
+

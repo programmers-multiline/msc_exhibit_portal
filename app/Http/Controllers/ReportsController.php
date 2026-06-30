@@ -83,4 +83,29 @@ class ReportsController extends Controller
        return view('reports.index', compact('reports', 'reports_per_WorldBex', 'reports_per_PhilConstruct','reports_per_PHA' ));
     }
 
+
+    //Agent Report
+    public function agentreport()
+    {
+        // Patakbuhin ang iyong pinagandang MySQL query
+        $agentReports = DB::table('assigned_agent as a')
+            ->leftJoin('contacts_update as cu', 'cu.company_id', '=', 'a.company_id')
+            ->leftJoin('lead_agent_status as l', 'l.id', '=', 'cu.status')
+            ->select(
+                'a.psc_name as agent_name',
+                DB::raw('COUNT(DISTINCT a.company_id) as total_assigned'),
+                DB::raw("COUNT(DISTINCT CASE WHEN l.lead_status = 'New Lead' THEN a.company_id END) as total_new_lead"),
+                DB::raw("COUNT(DISTINCT CASE WHEN l.lead_status NOT IN ('New Lead', 'Converted') THEN a.company_id END) as total_active_leads"),
+                DB::raw("COUNT(DISTINCT CASE WHEN l.lead_status = 'Converted' THEN a.company_id END) as total_converted"),
+                DB::raw('COUNT(DISTINCT a.company_id) as total_amount') // Palitan ng SUM kapag may actual currency field na
+            )
+            ->whereNotNull('a.psc_name')
+            ->where('a.psc_name', '<>', '')
+            ->groupBy('a.psc_name')
+            ->orderBy('total_assigned', 'desc')
+            ->get();
+
+        // Ipasa ang data sa iyong blade view
+        return view('reports.agent', compact('agentReports'));
+    }
 }

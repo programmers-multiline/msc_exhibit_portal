@@ -99,7 +99,7 @@
         <div class="table-responsive">
         <!-- Ilagay ito kahit saan sa iyong blade view -->
             <div id="assignPscWrapper" class="d-none ms-3">
-                @if (in_array(auth()->user()->position_id, [13, 237]))
+                @if (in_array(auth()->user()->position_id, [13, 237,158]))
                     <button type="button" class="btn btn-success d-inline-flex align-items-center justify-content-center px-4 text-white shadow-sm" id="bulkAssignBtn" style="height: 38px;">
                         <i class="bi bi-person-plus me-2"></i> Assign PSC
                     </button>
@@ -109,18 +109,12 @@
             <table id="ContactsTbl" class="table table-striped table-hover align-middle nowrap w-100" style="margin-top: 15px !important;">
                 <thead class="table-dark text-uppercase fs-3 tracking-wider">
                     <tr>
-                        <!-- Checkbox column kung gagamitin mo ang bulk assign function mo kanina -->
-                        <th class="text-center" style="width: 40px;">
-                            PSC Name
-                        </th>
+                        <th class="text-center" style="width: 40px;">PSC Name</th>
                         <th>Exhibit Name</th>
-                        <th>Company</th>
-                        <th>Contact Name</th>
-                        <th>Email Address</th>
-                        <th>Contact #</th>
-                        <th>Date </th>
-                        <th>Time</th>
-                        <th>Assisted By</th>
+                        <th>Company Info</th>
+                        <th>Contact Info</th>
+                        <th>Remarks</th>
+                        <th>Date Collected</th>
                         <th class="text-center" style="width: 100px;">Action</th>
                     </tr>
                 </thead>
@@ -373,43 +367,102 @@ $(document).ready(function(){
 
 function LoadContacts()
 {
-     $('#ContactsTbl').DataTable({
-        processing: true,
-        serverSide: true,
-         ajax: {
-            url: "{{ route('contacts.viewcontacts') }}",
-            data: function (d) {
-                d.startDate = $('#start').val();
-                d.endDate = $('#end').val();
-            }
-        },
+   $('#ContactsTbl').DataTable({
+    processing: true,
+    serverSide: true,
+    ajax: {
+        url: "{{ route('contacts.viewcontacts') }}",
+        data: function (d) {
+            d.startDate = $('#start').val();
+            d.endDate = $('#end').val();
+        }
+    },
 
-       columns: [
+    columns: [
         { data: 'checkbox', name: 'checkbox'},
         { data: 'exhibit_name', name: 'contacts.exhibit_name' },
-        { data: 'company_name', name: 'company_list.company_name' },
-        { data: 'contact_name', name: 'contacts.name' }, 
-        { data: 'email', name: 'contacts.email' },
-        { data: 'phone', name: 'contacts.phone' },
+     // PINAGSAMANG COMPANY AT ADDRESS
+    { 
+        data: 'company_name', 
+        name: 'company_list.company_name',
+        render: function(data, type, row) {
+            return `
+                <div class="company-info-block">
+                    <div class="company-title" style="color:#01134A; font-weight:bold;">${row.company_name || ''}</div>
+                    <div class="company-address">
+                        <i class="fas fa-map-marker-alt address-icon text-primary"></i> ${row.address || '—'}
+                        <i class="fas fa-edit" data-idcom="${row.id}" style="color:red;cursor:pointer;"></i>
+                    </div>
+                </div>
+            `;
+        }
+    },
+
+        // PINAGSAMANG COLUMN PARA SA CONTACT INFO
+    { 
+        data: 'contact_name', 
+        name: 'contacts.name',
+        render: function(data, type, row) {
+            return `
+                <div class="contact-info-block">
+                    <div class="contact-name" style="color:#8F6E03; font-weight:bold;">${row.contact_name || ''}</div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope contact-icon" style="color:#01454A;"></i> ${row.email || '—'}
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone contact-icon" style="color:#402101;"></i> ${row.phone || '—'}
+                        <i class="fas fa-edit" data-idcom="${row.id}" style="color:red;cursor:pointer;"></i>
+                    </div>
+                </div>
+            `;
+        }
+    },
+
+        { data: 'remarks', name: 'contacts.remarks' },
         { data: 'date', name: 'contacts.date' },
-        { data: 'time', name: 'contacts.time' },
-        { data: 'Entry_by', name: 'users.name' }, 
         { data: 'action', name: 'action', orderable: false, searchable: false }
     ],
-// DITO ILALAGAY ANG LOGIC PARA SA ALIGNMENT
-       initComplete: function() {
-                // Gawing flexbox ang container ng "Show entries"
-                $('.dataTables_length').addClass('d-flex align-items-center');
 
-                // Ilipat ang wrapper at puwersahin ang espasyo gamit ang inline style css
-                $('#assignPscWrapper').removeClass('d-none')
-                                    .css('margin-left', '20px') // <--- Ito ang puwersahang maglalagay ng 20px na space
-                                    .appendTo('.dataTables_length');
-            }
+    // DITO ILALAGAY ANG LOGIC PARA SA WORD BREAK AT ALIGNMENT
+    columnDefs: [
+        {
+            targets: [2,3,4], // Index ng columns na apektado (0-based index: 3 = address, 5 = email)
+            className: 'address-wrap' // Custom CSS class na gagawin natin sa ibaba
+        },
+        {
+            targets: 6, // Index ng columns na apektado (0-based index: 3 = address, 5 = email)
+            className: 'action_col1' // Custom CSS class na gagawin natin sa ibaba
+        }
+    ],
 
+    initComplete: function() {
+        // Gawing flexbox ang container ng "Show entries"
+        $('.dataTables_length').addClass('d-flex align-items-center');
 
-    });
+        // Ilipat ang wrapper at puwersahin ang espasyo gamit ang inline style css
+        $('#assignPscWrapper').removeClass('d-none')
+                            .css('margin-left', '20px') 
+                            .appendTo('.dataTables_length');
+    }
+});
+
 }
 
 </script>
+
+<style>
+/* I-apply ito para sa magandang text wrapping ng address */
+.address-wrap {
+    min-width: 250px !important;    /* Pinakamababang lapad para hindi maging vertical ang letra */
+    max-width: 350px !important;    /* Pinakamalapad na pwedeng abutin */
+    white-space: normal !important; /* Pinapayagan ang pagbaba sa susunod na linya */
+    word-break: keep-all !important;/* Hindi puputulin ang mismong salita sa gitna ng letra */
+    overflow-wrap: break-word !important; /* Bababa lang ang buong salita kapag kulang ang espasyo */
+}
+.action_col1
+{
+    text-align: center;
+}
+
+</style>
 @endsection

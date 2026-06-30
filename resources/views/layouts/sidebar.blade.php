@@ -77,8 +77,8 @@
 						<li class="{{ request()->is('introduction') ? 'active' : '' }}">
 							<a href="/reports">Summary Report</a>
 						</li>
-						<li class="{{ request()->is('getting-started') ? 'active' : '' }}">
-							<a href="getting-started.html">Sent Email Summary Reports</a>
+						<li class="{{ request()->is('/reports/agent-performance') ? 'active' : '' }}">
+							<a href="/reports/agent-performance">Agent Report</a>
 						</li>
 						<li class="{{ request()->is('color-settings') ? 'active' : '' }}">
 							<a href="color-settings.html">Summary Report Per Agent</a>

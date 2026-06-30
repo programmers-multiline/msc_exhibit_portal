@@ -23,62 +23,6 @@ use App\Models\ContactsUpdate;
 class ContactImportController extends Controller
 {
 
-/* public function ViewContacts(Request $request)
-    {
-           
-if ($request->ajax()) {
-        // Paggamit ng Query Builder na may Left Join sa Users
-            $data = DB::table('contacts')
-                ->leftJoin('users', 'contacts.entry_by', '=', 'users.emp_id')
-                ->leftJoin('company_list', 'company_list.id', '=', 'contacts.company_id')
-                ->leftJoin('assigned_agent', 'company_list.id', '=', 'assigned_agent.company_id')
-                ->select([
-                    'contacts.entry_by',
-                    'contacts.exhibit_name',
-                    'contacts.date',
-                    'contacts.time',
-                    'contacts.name AS contact_name',   // In-alias para hindi mag-clash sa users.name
-                    'contacts.company_id',
-                    'company_list.company_name',
-                    'contacts.title',
-                    'contacts.phone',
-                    'contacts.email', // In-alias para hindi mag-clash sa users.email
-                    'users.name AS Entry_by',
-                    'assigned_agent.psc_name'       // Pangalan ng user mula sa users table
-                ]);
-            
-            return DataTables::of($data)
-                ->addColumn('checkbox', function($row){
-                    // Gamitin ang check para sa position_id ng kasalukuyang naka-login na user
-                     // 1. Check kung may assigned PSC
-                if (!empty($row->psc_name)) {
-                    return '<span class="btn btn-sm btn btn-outline-success" style="font-size:8">
-                               '.$row->psc_name.'
-                            </span>';
-                         }
-                    else if (in_array(auth()->user()->position_id, [13, 237])) {
-                        // Pansinin: 'contact_email' na ang ginamit natin mula sa alias sa itaas
-                        return '<input type="checkbox"
-                                class="participant_checkbox"
-                                value="'.$row->company_id.'">';
-                    } else {
-                        return '--';
-                    }
-                })
-                ->addColumn('action', function($row){
-                    // Pwede ka maglagay ng edit o delete button dito
-                    return '<a href="#" class="btn btn-sm btn-primary">Edit</a>';
-                })
-                ->rawColumns(['checkbox','action']) // Pinapayagan ang HTML sa column na ito
-                ->make(true);
-    }
-
-    $users = ExternalUser::getUsersWithCompanyAndDepartment();
-    //dd($users);
-    return view('contacts.viewcontacts', compact('users')); // Dito ipapakita ang HTML page
-     
- } */
-
     public function ViewContacts(Request $request)
 {
     $user = Auth::user();    
@@ -91,6 +35,7 @@ if ($request->ajax()) {
             ->leftJoin('assigned_agent', 'company_list.id', '=', 'assigned_agent.company_id')
             ->leftJoin('users as ua', 'assigned_agent.psc_emp_id', '=', 'ua.emp_id')
             ->select([
+                'contacts.id',
                 'contacts.entry_by',
                 'contacts.exhibit_name',
                 'contacts.date',
@@ -98,9 +43,11 @@ if ($request->ajax()) {
                 'contacts.name AS contact_name',   
                 'contacts.company_id',
                 'company_list.company_name',
+                'company_list.address',
                 'contacts.title',
                 'contacts.phone',
                 'contacts.email', 
+                'contacts.remarks', 
                 'users.name AS Entry_by',
                 'assigned_agent.psc_name',
                 'ua.last_name'       
@@ -135,7 +82,8 @@ if ($request->ajax()) {
                 }
             })
             ->addColumn('action', function($row){
-                return '<a href="#" class="btn btn-sm btn-primary">Edit</a>';
+                //return '<a href="#" class="btn btn-sm btn-primary">Edit</a>';
+                return '<i class="fas fa-edit" data-id="'.$row->id.'" style="cursor:pointer; color:red; font-size:14px;" title="Click to Edit"></i>';
             })
             ->rawColumns(['checkbox','action']) 
             ->make(true);
@@ -161,6 +109,7 @@ if ($request->ajax()) {
                     ->leftJoin('assigned_agent', 'company_list.id', '=', 'assigned_agent.company_id')
                     ->leftJoin('users as ua', 'assigned_agent.psc_emp_id', '=', 'ua.emp_id')
                     ->select([
+                        'attendance.id',
                         'attendance.entry_by',
                         'attendance.exhibit_name',
                         'attendance.date',
@@ -168,6 +117,7 @@ if ($request->ajax()) {
                         'attendance.name as contact_name',   
                         'attendance.company_id',
                         'company_list.company_name',
+                        'company_list.address',
                         'attendance.title',
                         'attendance.phone',
                         'attendance.email as contact_email', 
@@ -205,7 +155,8 @@ if ($request->ajax()) {
                 }
             })
             ->addColumn('action', function($row){
-                return '<a href="#" class="btn btn-sm btn-primary">Edit</a>';
+               // return '<a href="#" class="btn btn-sm btn-primary" data-id="'.$row->id.'">Edit</a>';
+                return '<i class="fas fa-edit" data-id="'.$row->id.'" style="cursor:pointer; color:red;"></i>';
             })
             ->rawColumns(['checkbox','action']) 
             ->make(true);

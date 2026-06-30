@@ -51,12 +51,14 @@
                 <div class="progress mb-2" style="height: 6px;">
                     <div class="progress-bar progress-bar-custom" role="progressbar" style="width: {{ $companyData['status_percentage'] }};"></div>
                 </div>
+                 @if (in_array(auth()->user()->position_id, [13, 237,158]))
                 <div class="form-check m-0">
                     <input class="form-check-input border-danger participant_checkbox" type="checkbox" id="checkAssign_{{ $loop->index }}" value="{{$companyData['company_id']}}">
                     <label class="form-check-label text-danger fw-medium" for="checkAssign_{{ $loop->index }}">
                         Check to Change PSC
                     </label>
                 </div>
+                @endif
             </div>
 
             <!-- 3. COMPANY CONTACTS SECTION WITH STRICT SCROLL HEIGHT -->
@@ -288,7 +290,7 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-success" id="saveStatus">
-            Save2
+            Save
         </button>
       </div>
 
