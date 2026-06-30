@@ -180,3 +180,6 @@ Route::post('/AssignedContact/update-status/{id}', [ContactImportController::cla
 Route::get('/reports', [ReportsController::class, 'index']);
 Route::get('/reports/agent-performance', [ReportsController::class, 'agentreport'])->name('reports.agent');
 
+// Dito tatawag ang AJAX para kumuha ng detalye kada agent
+Route::get('/reports/agent-details', [ReportsController::class, 'getAssignedDetails'])->name('reports.agent.details');
+

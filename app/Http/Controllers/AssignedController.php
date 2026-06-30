@@ -75,9 +75,6 @@ $rawResults = DB::table('company_list as cm') // 1. Main table is already cm
         return $query->where('cm.assigned_psc', $user->emp_id);
     })
     // KONDISYON 2: Kung ang position_id ay 13
-  /*   ->when($user->position_id == 13, function ($query) use ($user) {
-        return $query->where('u.group_id', $user->emp_id);
-    }) */
    ->when(in_array($user->position_id, [13, 158]), function ($query) use ($user) {
     return $query->whereIn('u.group_id', [$user->emp_id]);
 })

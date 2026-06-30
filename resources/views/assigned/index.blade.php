@@ -104,7 +104,9 @@
                                             id="UpdateStatus"
                                             data-id="{{ $companyData['company_id'] }}"
                                             data-cname="{{ $companyData['company_name'] }}"
-                                            data-lead_status="{{ $companyData['ContactUpdate'] }}">
+                                            data-lead_status="{{ $companyData['ContactUpdate'] }}"
+                                            data-remarks="{{ $companyData['UpdateRemarks'] }}"
+                                            >
                                         <i class="fas fa-pencil-alt me-1"></i> &nbsp;Update Status 
                                     </button>
                                 @endif
@@ -255,7 +257,7 @@
 
       <div class="modal-body">
         <input type="hidden" id="company_id">
-         <p id="CompanyName" class="bg bg-success text-white p-2"></p>   
+         <p id="CompanyName" class="text-white p-2" style="background-color:#1e1f71; color:whitesmoke;"></p>   
         <div class="mb-3">
             <label>Select Activity</label>
             <select class="form-control" id="lead_status">
@@ -483,14 +485,16 @@ $('#saveStatus').click(function(){
 //Use to open the modal of Updating status
     $(document).on('click', '#UpdateStatus', function(){
 //alert('Test');
- var id          = $(this).data('id');
- var cname       = $(this).data('cname');
- var lead_status = $(this).data('lead_status');
+ var id            = $(this).data('id');
+ var cname         = $(this).data('cname');
+ var lead_status   = $(this).data('lead_status');
+ var StatusRemarks = $(this).data('remarks');
 
 console.log(id)
     $('#CompanyName').text(cname);
     $('#company_id').val(id);
     $('#lead_status').val(lead_status);
+    $('#description').val(StatusRemarks);
 
     
     $('#statusModal').modal('show');
