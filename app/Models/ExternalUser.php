@@ -20,7 +20,7 @@ class ExternalUser extends Model
 
     public static function getUsersWithCompanyAndDepartment()
         {
-             Session::put('company_id',3);
+            // Session::put('company_id',3);
              $user = Auth::user();
          //  dd($user);
             return self::select(
