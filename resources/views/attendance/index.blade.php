@@ -100,7 +100,7 @@
         <div class="table-responsive">
             
             <div id="assignPscWrapper" class="d-none ms-3">
-                @if (in_array(auth()->user()->position_id, [13, 237]))
+                @if (in_array(auth()->user()->position_id, [13, 237, 158]))
                     <button type="button" class="btn btn-success d-inline-flex align-items-center justify-content-center px-4 text-white shadow-sm" id="bulkAssignBtn" style="height: 38px;">
                         <i class="bi bi-person-plus me-2"></i> Assign PSC
                     </button>
