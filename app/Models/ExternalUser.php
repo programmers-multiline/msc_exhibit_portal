@@ -22,6 +22,7 @@ class ExternalUser extends Model
         {
             // Session::put('company_id',3);
              $user = Auth::user();
+            // dd($user);
          //  dd($user);
             return self::select(
                     'users.emp_id',
@@ -38,7 +39,7 @@ class ExternalUser extends Model
                 ->orderBy('users.first_name')
                 ->where('users.status', 1)
                 ->where('oms_departments.department', 'like', '%sales%')
-                ->where('users.company_id', session('company_id'))
+              //  ->where('users.company_id', session('company_id'))
                 //->where('oms_departments.id', $user->department_id) 
                 ->where('users.group_id', $user->emp_id) 
                 ->get();

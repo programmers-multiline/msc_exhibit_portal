@@ -98,8 +98,8 @@ class ContactImportController extends Controller
 
  public function ViewAttendance(Request $request)
 {
-    $user = Auth::user();    
-       
+   $user = Auth::user();  
+   
     if ($request->ajax()) {
 
         // 1. Simulan ang query gamit ang variable name na $query (Huwag muna mag-get() o mag-semicolon)
@@ -162,7 +162,7 @@ class ContactImportController extends Controller
             ->make(true);
     }
 
-    $users = ExternalUser::getUsersWithCompanyAndDepartment();
+    $users = ExternalUser::getUsersWithCompanyAndDepartment(); 
     return view('attendance.index', compact('users')); 
 }
 
